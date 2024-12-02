@@ -36,14 +36,12 @@ class GameSettings():
                 if(self.check_settings() > 0):
                     self.save_settings()
         else:
-            raise FileNotFoundError(f"Could not find Game Settings File at {self.settings_path}")
+            self.check_settings()
+            self.save_settings()
     
     def save_settings(self):
-        if os.path.exists(self.settings_path):
-            with open(self.settings_path, "w") as settings_file:
-                json.dump(self.game_settings, settings_file, indent=4)
-        else:
-            raise FileNotFoundError(f"Could not find Game Settings File at {self.settings_path}")
+        with open(self.settings_path, "w") as settings_file:
+            json.dump(self.game_settings, settings_file, indent=4)
 
     def get_setting(self, key):
         if key in self.game_settings:
