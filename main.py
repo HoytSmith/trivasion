@@ -1,8 +1,11 @@
 #imports
 import pygame
+from src.gamesettings import GameSettings
 
 #main program
 def main():
+    #setup game settings
+    game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
     #setup pygame
     pygame.init()
     screen = pygame.display.set_mode()
