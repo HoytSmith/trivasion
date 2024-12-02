@@ -1,3 +1,6 @@
 {
-    "selected_resolution" : [800, 600]
+    "screen_resolution": [
+        800,
+        600
+    ]
 }
