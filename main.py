@@ -6,9 +6,10 @@ from src.gamesettings import GameSettings
 def main():
     #setup game settings
     game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
+    screen_resolution = game_settings.get_setting("selected_resolution")
     #setup pygame
     pygame.init()
-    screen = pygame.display.set_mode()
+    screen = pygame.display.set_mode(screen_resolution)
 
     #game loop
     game_is_running = True

@@ -30,3 +30,10 @@ class GameSettings():
     
     def save_settings(self):
         True
+
+    def get_setting(self, key):
+        if key in self.game_settings:
+            return self.game_settings[key]
+        if key in self.default_settings:
+            return self.default_settings[key]
+        raise Exception("Game setting not found")
