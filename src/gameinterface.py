@@ -5,6 +5,7 @@ class GameInterface():
         self.reset_components()
         self.add_components(initial_components)
         self.deactivate()
+        self.hide()
     
     def is_active(self):
         return self.__active
@@ -18,6 +19,15 @@ class GameInterface():
         for component in self.__components:
             component.activate()
         self.__active = True
+    
+    def hide(self):
+        self.__visible = False
+    
+    def show(self):
+        self.__visible = True
+    
+    def is_visible(self):
+        return self.__visible
     
     def reset_components(self):
         self.__components = []
@@ -50,11 +60,12 @@ class GameInterface():
         return None
     
     def render(self, screen):
-        if self.is_active():
+        if self.is_visible():
             for component in self.__components:
                 component.render(screen)
     
     def handle_event(self, event):
         if self.is_active():
             for component in self.__components:
-                component.handle_event(event)
+                if component.handle_event(event):
+                    break

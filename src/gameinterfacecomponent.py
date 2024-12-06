@@ -6,6 +6,7 @@ class GameInterfaceComponent():
         self.set_position(position)
         self.set_size(size)
         self.deactivate()
+        self.hide()
     
     def is_active(self):
         return self.__active
@@ -15,6 +16,15 @@ class GameInterfaceComponent():
     
     def activate(self):
         self.__active = True
+
+    def hide(self):
+        self.__visible = False
+    
+    def show(self):
+        self.__visible = True
+    
+    def is_visible(self):
+        return self.__visible
     
     def is_named(self, name):
         if not isinstance(name, str):
@@ -68,7 +78,7 @@ class GameInterfaceComponent():
         return self.__size[1]
     
     def render(self, screen):
-        if self.is_active():
+        if self.is_visible():
             #Render logic
             # Example: Draw a placeholder rectangle
             pygame.draw.rect(screen, (200, 200, 200), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
