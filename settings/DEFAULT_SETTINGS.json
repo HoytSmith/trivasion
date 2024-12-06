@@ -2,5 +2,6 @@
     "screen_resolution": [
         800,
         600
-    ]
+    ],
+    "fps_limit" : 60
 }
