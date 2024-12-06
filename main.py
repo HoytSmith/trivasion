@@ -2,6 +2,8 @@
 import pygame
 from src.gamesettings import GameSettings
 from src.gamestates import GameState
+from src.gameinterface import GameInterface
+from src.gameinterfacecomponent import GameInterfaceComponent
 
 #basic setup
 game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
