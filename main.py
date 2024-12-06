@@ -1,11 +1,15 @@
 #imports
 import pygame
 from src.gamesettings import GameSettings
+from src.gamestates import GameState
+
+#basic setup
+game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
+current_state = GameState.START
 
 #main program
 def main():
-    #setup game settings
-    game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
+    global game_settings, current_state
     screen_resolution = game_settings.get_setting("screen_resolution")
     #setup pygame
     pygame.init()
