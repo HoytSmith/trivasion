@@ -1,9 +1,10 @@
 from gameinterfacecomponent import GameInterfaceComponent
 
 class GameInterface():
-    def __init__(self, initial_components=[]):
+    def __init__(self, initial_components=None):
         self.reset_components()
-        self.add_components(initial_components)
+        if initial_components:
+            self.add_components(initial_components)
         self.deactivate()
         self.hide()
     
