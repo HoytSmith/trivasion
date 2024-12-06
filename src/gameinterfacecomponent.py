@@ -1,7 +1,7 @@
 import pygame
 
 class GameInterfaceComponent():
-    def __init__(self, name="", position=(0,0), size=(0,0)):
+    def __init__(self, name="", position=(0,0), size=(10,10)):
         self.set_name(name)
         self.set_position(position)
         self.set_size(size)
@@ -58,10 +58,12 @@ class GameInterfaceComponent():
             raise IndexError("Position is not properly set!")
         return self.__position[1]
     
-    def set_size(self, size=(0,0)):
+    def set_size(self, size=(10,10)):
         for dimension in size:
             if not isinstance(dimension, int):
                 raise ValueError("Size must contain integer values only!")
+            if dimension < 1:
+                raise ValueError("Size must contain values above 0!")
         self.__size = size
     
     def get_size(self):
