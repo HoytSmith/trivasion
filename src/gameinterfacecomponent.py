@@ -1,7 +1,7 @@
 import pygame
 
 class GameInterfaceComponent():
-    def __init__(self, name="", position=(0,0), size=(10,10)):
+    def __init__(self, name="Component", position=(0,0), size=(10,10)):
         self.set_name(name)
         self.set_position(position)
         self.set_size(size)
