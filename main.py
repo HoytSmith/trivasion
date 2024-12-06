@@ -9,6 +9,13 @@ from src.gameinterfacecomponent import GameInterfaceComponent
 game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
 current_state = GameState.START
 
+#setup game interfaces
+gamemenu_interface = GameInterface()
+gameplay_interface = GameInterface()
+gamepause_interface = GameInterface()
+gameover_interface = GameInterface()
+interfaces = [gamemenu_interface, gameplay_interface, gamepause_interface, gameover_interface]
+
 #main program
 def main():
     global game_settings, current_state
@@ -26,10 +33,13 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_is_running = False
+            for interface in interfaces:
+                interface.handle_event(event)
         #tick update logic
         #draw update logic
         screen.fill("black")
-        #RENDER LOGIC
+        for interface in interfaces:
+            interface.render(screen)
         pygame.display.flip()
 
         #limit tickrate
