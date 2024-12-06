@@ -21,9 +21,13 @@ class GameInterface():
         self.__active = True
     
     def hide(self):
+        for component in self.__components:
+            component.hide()
         self.__visible = False
     
     def show(self):
+        for component in self.__components:
+            component.show()
         self.__visible = True
     
     def is_visible(self):
