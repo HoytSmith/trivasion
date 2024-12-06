@@ -89,6 +89,8 @@ class GameInterfaceComponent():
             mouse_x, mouse_y = event.pos
             if self.get_x() <= mouse_x <= self.get_x() + self.get_width() and self.get_y() <= mouse_y <= self.get_y() + self.get_height():
                 self.on_click()
+                return True
+        return False
 
     def on_click(self):
         # Override in subclasses for specific behavior
