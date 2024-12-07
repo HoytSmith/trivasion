@@ -42,7 +42,7 @@ class GameInterfaceComponent():
     def set_position(self, position=(0,0)):
         for coordinate in position:
             if not isinstance(coordinate, int):
-                raise ValueError("Position must contain integer values only!")
+                raise TypeError("Position must contain integer values only!")
         self.__position = position
     
     def get_position(self):
@@ -61,7 +61,7 @@ class GameInterfaceComponent():
     def set_size(self, size=(10,10)):
         for dimension in size:
             if not isinstance(dimension, int):
-                raise ValueError("Size must contain integer values only!")
+                raise TypeError("Size must contain integer values only!")
             if dimension < 1:
                 raise ValueError("Size must contain values above 0!")
         self.__size = size
