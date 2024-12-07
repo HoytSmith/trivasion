@@ -6,6 +6,7 @@ class Label(GameInterfaceComponent):
         super().__init__(name, position, size)
         self.set_content(content)
         self.set_color(color)
+        self.update_label()
     
     def set_content(self, content):
         if not isinstance(content, str):
@@ -24,6 +25,8 @@ class Label(GameInterfaceComponent):
         return self.__size
 
     def set_color(self, color=(255, 255, 255)):
+        if not isinstance(color, tuple) and len(color) != 3:
+            raise TypeError("Label text color must be a tuple with 3 values!")
         for c in color:
             if not isinstance(c, int):
                 raise TypeError("Label text color must contain integer values only!")
@@ -33,12 +36,38 @@ class Label(GameInterfaceComponent):
     
     def get_color(self):
         return self.__color
+    
+    def set_font(self):
+        self.__font = pygame.font.Font(None, self.get_size())
+    
+    def get_font(self):
+        return self.__font
+    
+    def set_render(self):
+        self.__render = self.get_font().render(self.get_content(), True, self.get_color())
+    
+    def get_render(self):
+        return self.__render
+    
+    def update_label(self):
+        self.set_font()
+        self.set_render()
+    
+    def update_content(self, content):
+        self.set_content(content)
+        self.update_label()
+    
+    def update_size(self, size):
+        self.set_size(size)
+        self.update_label()
+    
+    def update_color(self, color):
+        self.set_color(color)
+        self.update_label()
 
     def render(self, screen):
         #Render logic
-        font = pygame.font.Font(None, self.get_size())
-        text_surface = font.render(self.get_content(), True, self.get_color())
-        screen.blit(text_surface, (self.get_x(), self.get_y()))
+        screen.blit(self.get_render(), (self.get_x(), self.get_y()))
     
     def handle_event(self, event):
         # Labels are always non-interactive
