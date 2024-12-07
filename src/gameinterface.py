@@ -1,4 +1,4 @@
-from gameinterfacecomponent import GameInterfaceComponent
+from src.gameinterfacecomponent import GameInterfaceComponent
 
 class GameInterface():
     def __init__(self, initial_components=None):
