@@ -4,6 +4,7 @@ from src.gamesettings import GameSettings
 from src.gamestates import GameState
 from src.gameinterface import GameInterface
 from src.gameinterfacecomponent import GameInterfaceComponent
+from src.label import Label
 
 #globals
 game_is_running = True
@@ -31,7 +32,10 @@ def init_pygame():
 
 #(re)set main menu interface
 def init_menu_interface():
-    return GameInterface()
+    menu_interface = GameInterface()
+    menu_title = Label("Menu_Title", "Main Menu", (300, 100), 50)
+    menu_interface.add_component(menu_title)
+    return menu_interface
 
 #(re)set gameplay interface
 def init_gameplay_interface():
