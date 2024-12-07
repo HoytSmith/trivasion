@@ -24,7 +24,9 @@ def init_game():
 def init_pygame():
     global game_settings, screen, clock
     pygame.init()
-    screen = pygame.display.set_mode(game_settings.get_setting("screen_resolution"))
+    fullscreen = game_settings.get_setting("fullscreen")
+    flags = pygame.FULLSCREEN if fullscreen else 0
+    screen = pygame.display.set_mode(game_settings.get_setting("screen_resolution"), flags)
     clock = pygame.time.Clock()
 
 #(re)set main menu interface
