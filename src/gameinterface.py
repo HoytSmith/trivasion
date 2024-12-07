@@ -65,12 +65,12 @@ class GameInterface():
         return None
     
     def render(self, screen):
-        if self.is_visible():
-            for component in self.__components:
+        for component in self.__components:
+            if component.is_visible():
                 component.render(screen)
     
     def handle_event(self, event):
-        if self.is_active():
-            for component in self.__components:
+        for component in self.__components:
+            if component.is_active():
                 if component.handle_event(event):
                     break

@@ -80,10 +80,9 @@ class GameInterfaceComponent():
         return self.__size[1]
     
     def render(self, screen):
-        if self.is_visible():
-            #Render logic
-            # Example: Draw a placeholder rectangle
-            pygame.draw.rect(screen, (200, 200, 200), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
+        #Render logic
+        # Example: Draw a placeholder rectangle
+        pygame.draw.rect(screen, (200, 200, 200), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
     
     def handle_event(self, event):
         # Example: Check if a mouse click is within the component
