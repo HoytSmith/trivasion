@@ -13,9 +13,11 @@ from src.button import Button
 game_is_running = True
 game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
 current_state = GameState.START
+pending_state = None
 interfaces = {}
 screen = None
 clock = None
+mouse_button_held = False
 
 #initializes the game. resets everything when called again later
 def init_game():
@@ -52,7 +54,7 @@ def init_menu_interface():
     menu_button.set_style(key=ButtonState.IDLE, style=menu_button_idle)
     menu_button.set_style(key=ButtonState.HOVER, style=menu_button_hover)
     menu_button.set_style(key=ButtonState.ACTIVE, style=menu_button_active)
-    menu_button.set_callback(lambda: change_state(GameState.PLAY))
+    menu_button.set_callback(lambda: queue_state(GameState.PLAY))
 
     #add components to interface
     menu_interface.add_component(menu_title_box)
@@ -78,7 +80,7 @@ def init_gameplay_interface():
     gameplay_quit_button.set_style(key=ButtonState.IDLE, style=gameplay_quit_button_idle)
     gameplay_quit_button.set_style(key=ButtonState.HOVER, style=gameplay_quit_button_hover)
     gameplay_quit_button.set_style(key=ButtonState.ACTIVE, style=gameplay_quit_button_active)
-    gameplay_quit_button.set_callback(lambda: change_state(GameState.START))
+    gameplay_quit_button.set_callback(lambda: queue_state(GameState.START))
 
     #add components to interface
     gameplay_interface.add_component(gameplay_title_box)
@@ -110,13 +112,25 @@ def get_interface(state):
     global interfaces
     return interfaces.get(state, None)
 
+def queue_state(new_state):
+    global pending_state
+    pending_state = new_state
+
 #direct gameflow
 def change_state(new_state):
     global current_state
+
+    #quick check to see if this is even necessary
+    if current_state == new_state:
+        return
+    
+    #various game screens
     menu = get_interface(GameState.MENU)
     gameplay = get_interface(GameState.PLAY)
     gamepause = get_interface(GameState.PAUSE)
     gameover = get_interface(GameState.END)
+
+    #switch to new state
     current_state = new_state
     if current_state == GameState.START:
         init_game()
@@ -142,13 +156,26 @@ def change_state(new_state):
 
 #called during gameloop to handle events
 def handle_events():
-    global game_is_running, interfaces
+    global game_is_running, pending_state, interfaces, mouse_button_held
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_is_running = False
-        for i in interfaces:
-            if interfaces[i].is_active():
-                interfaces[i].handle_event(event)
+            return
+        #Ensure only first frame of MOUSEBUTTONDOWN is processed
+        toggle_mouse_state = (event.type == pygame.MOUSEBUTTONDOWN and not mouse_button_held) or (event.type == pygame.MOUSEBUTTONUP and mouse_button_held)
+
+        for interface in interfaces.values():
+            if interface.is_active():
+                interface.handle_event(event, mouse_button_held)
+        
+        #Mouse state is toggled after event is consumed
+        if toggle_mouse_state:
+            mouse_button_held = not mouse_button_held
+        
+        #resolve state changes after events are handled
+        if pending_state:
+            change_state(pending_state)
+            pending_state = None
 
 #called during gameloop to render the game
 def render_game():
@@ -161,7 +188,7 @@ def render_game():
 
 #main program, contains the gameloop
 def main():
-    global game_is_running, game_settings, clock
+    global game_is_running, game_settings, clock, pending_state
     init_game()
 
     #game loop
@@ -171,7 +198,7 @@ def main():
         #tick update logic
         #draw update logic
         render_game()
-
+        
         #limit tickrate
         clock.tick(game_settings.get_setting("fps_limit"))
 

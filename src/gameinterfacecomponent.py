@@ -145,12 +145,8 @@ class GameInterfaceComponent():
         #Default component is a rectangle
         pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
     
-    def handle_event(self, event):
-        # Example: Check if a mouse click is within the component
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if self.mouse_over(event.pos):
-                self.on_click()
-                return True
+    def handle_event(self, event, mouse_button_held):
+        # Default Component doesn't handle events
         return False
 
     def update_component(self):

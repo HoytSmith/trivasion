@@ -47,7 +47,7 @@ class Label(GameInterfaceComponent):
         #Render cached text surface
         screen.blit(self.get_render(), (self.get_x(), self.get_y()))
     
-    def handle_event(self, event):
+    def handle_event(self, event, mouse_button_held):
         # Labels are always non-interactive
         return False
     

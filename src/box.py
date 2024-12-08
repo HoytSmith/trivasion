@@ -82,11 +82,11 @@ class Box(GameInterfaceComponent):
             if child.is_visible():
                 child.render(screen)
     
-    def handle_event(self, event):
+    def handle_event(self, event, mouse_button_held):
         # Children might be interactive
         for child in self.__children:
             if child.is_active():
-                if child.handle_event(event):
+                if child.handle_event(event, mouse_button_held):
                     break
         # Boxes themselves are non-interactive
         return False

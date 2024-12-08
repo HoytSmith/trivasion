@@ -87,8 +87,8 @@ class GameInterface():
             if component.is_visible():
                 component.render(screen)
     
-    def handle_event(self, event):
+    def handle_event(self, event, mouse_button_held):
         for component in self.__components:
             if component.is_active():
-                if component.handle_event(event):
+                if component.handle_event(event, mouse_button_held):
                     break

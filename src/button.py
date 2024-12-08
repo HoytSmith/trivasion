@@ -91,8 +91,8 @@ class Button(GameInterfaceComponent):
         if label:
             label.render(screen)
 
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
+    def handle_event(self, event, mouse_button_held):
+        if event.type == pygame.MOUSEBUTTONDOWN and not mouse_button_held:
             if self.mouse_over(event.pos):
                 self.on_click()
                 return True
