@@ -2,11 +2,10 @@ import pygame
 from src.gameinterfacecomponent import GameInterfaceComponent
 
 class Label(GameInterfaceComponent):
-    def __init__(self, name="Label", content="Text here...", position=(0,0), color=(255, 255, 255), font_size=24):
-        super().__init__(name=name, position=position, color=color)
+    def __init__(self, name="Label", priority=0, content="Text here...", position=(0,0), color=(255, 255, 255), font_size=24):
         self.set_content(content)
         self.set_font_size(font_size)
-        self.update_label()
+        super().__init__(name=name, priority=priority, position=position, color=color)
     
     def set_content(self, content):
         if not isinstance(content, str):
@@ -36,26 +35,23 @@ class Label(GameInterfaceComponent):
     def get_render(self):
         return self.__render
     
-    def update_label(self):
-        self.set_font()
-        self.set_render()
-    
     def update_content(self, content):
         self.set_content(content)
-        self.update_label()
+        self.update_component()
     
     def update_size(self, size):
         self.set_font_size(size)
-        self.update_label()
-    
-    def update_color(self, color):
-        self.set_color(color)
-        self.update_label()
+        self.update_component()
 
     def render(self, screen):
-        #Render logic
+        #Render cached text surface
         screen.blit(self.get_render(), (self.get_x(), self.get_y()))
     
     def handle_event(self, event):
         # Labels are always non-interactive
         return False
+    
+    def update_component(self):
+        self.set_font()
+        self.set_render()
+        super().update_component()

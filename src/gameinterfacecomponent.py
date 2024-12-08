@@ -1,13 +1,15 @@
 import pygame
 
 class GameInterfaceComponent():
-    def __init__(self, name="Component", position=(0,0), size=(10,10), color=(255,255,255)):
+    def __init__(self, name="Component", priority=0, position=(0,0), size=(10,10), color=(255,255,255)):
         self.set_name(name)
+        self.set_priority(priority)
         self.set_position(position)
         self.set_size(size)
         self.set_color(color)
         self.deactivate()
         self.hide()
+        self.update_component()
     
     def is_active(self):
         return self.__active
@@ -40,10 +42,17 @@ class GameInterfaceComponent():
             raise TypeError("Name must be of type String!")
         self.__name = name
     
+    def set_priority(self, priority):
+        if not (isinstance(priority, int) and priority >= 0):
+            raise TypeError("Priority must be an integer of at least 0!")
+        self.__priority = priority
+    
+    def get_priority(self):
+        return self.__priority
+    
     def set_position(self, position=(0,0)):
-        for coordinate in position:
-            if not isinstance(coordinate, int):
-                raise TypeError("Position must contain integer values only!")
+        if not (isinstance(position, tuple) and len(position) == 2 and all(isinstance(c, int) for c in position)):
+            raise TypeError("Position must be a tuple containing 2 integers!")
         self.__position = position
     
     def get_position(self):
@@ -59,30 +68,20 @@ class GameInterfaceComponent():
             raise IndexError("Position is not properly set!")
         return self.__position[1]
     
+    def move(self, movement=(0,0)):
+        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
+            raise TypeError("Movement must be a tuple containing 2 integers!")
+        self.set_position(self.get_x()+movement[0], self.get_y()+movement[1])
+        self.update_component()
+
     def set_size(self, size=(10,10)):
-        for dimension in size:
-            if not isinstance(dimension, int):
-                raise TypeError("Size must contain integer values only!")
-            if dimension < 1:
-                raise ValueError("Size must contain values above 0!")
+        if not (isinstance(size, tuple) and len(size) == 2 and all(isinstance(d, int) and d > 0 for d in size)):
+            raise TypeError("Size must be a tuple containing 2 integers greater than 0!")
         self.__size = size
     
     def get_size(self):
         return self.__size
     
-    def set_color(self, color=(255, 255, 255)):
-        if not isinstance(color, tuple) and len(color) != 3:
-            raise TypeError("Component color must be a tuple with 3 values!")
-        for c in color:
-            if not isinstance(c, int):
-                raise TypeError("Component color must contain integer values only!")
-            if c < 0 or c > 255:
-                raise ValueError("Component color must contain values between 0 and 255!")
-        self.__color = color
-    
-    def get_color(self):
-        return self.__color
-
     def get_width(self):
         if len(self.__size) != 2:
             raise IndexError("Size is not properly set!")
@@ -93,19 +92,69 @@ class GameInterfaceComponent():
             raise IndexError("Size is not properly set!")
         return self.__size[1]
     
+    def update_size(self, newsize):
+        self.set_size(newsize)
+        self.update_component()
+    
+    def calculate_boundaries(self):
+        if not (len(self.__position) == 2 and len(self.__size) == 2):
+            raise ValueError("Position and Size must be properly set before boundaries can be calculated!")
+        self.__boundaries = {
+            "top" : self.get_y(),
+            "left" : self.get_x(),
+            "right" : self.get_x()+self.get_width(),
+            "bottom" : self.get_y()+self.get_height()
+        }
+
+    def get_boundaries(self):
+        return self.__boundaries
+
+    def set_color(self, color=(255, 255, 255)):
+        if not (isinstance(color, tuple) and len(color) == 3 and all(isinstance(c, int) and 0 <= c <= 255 for c in color)):
+            raise TypeError("Color must be a tuple with 3 integers between 0 and 255!")
+        self.__color = color
+    
+    def get_color(self):
+        return self.__color
+    
+    def update_color(self, color):
+        self.set_color(color)
+        self.update_component()
+    
+    def collides(self, component):
+        if not isinstance(component, GameInterfaceComponent):
+            raise TypeError("Component must be object of GameInterfaceComponent class or subclass!")
+        
+        # Get boundaries for self
+        self_boundaries = self.get_boundaries()
+
+        # Get boundaries for component
+        component_boundaries = component.get_boundaries()
+
+        # Check for overlap
+        vertical_overlap = self_boundaries["top"] <= component_boundaries["bottom"] and self_boundaries["bottom"] >= component_boundaries["top"]
+        horizontal_overlap = self_boundaries["left"] <= component_boundaries["right"] and self_boundaries["right"] >= component_boundaries["left"]
+
+        return horizontal_overlap and vertical_overlap
+    
+    def mouse_over(self, mouse_pos):
+        mouse_x, mouse_y = mouse_pos
+        return (self.get_x() <= mouse_x <= self.get_x() + self.get_width() and self.get_y() <= mouse_y <= self.get_y() + self.get_height())
+
     def render(self, screen):
-        #Render logic
-        # Example: Draw a placeholder rectangle
+        #Default component is a rectangle
         pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
     
     def handle_event(self, event):
         # Example: Check if a mouse click is within the component
         if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = event.pos
-            if self.get_x() <= mouse_x <= self.get_x() + self.get_width() and self.get_y() <= mouse_y <= self.get_y() + self.get_height():
+            if self.mouse_over(event.pos):
                 self.on_click()
                 return True
         return False
+
+    def update_component(self):
+        self.calculate_boundaries()
 
     def on_click(self):
         # Override in subclasses for specific behavior
