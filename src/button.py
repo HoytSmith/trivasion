@@ -74,13 +74,13 @@ class Button(GameInterfaceComponent):
             raise TypeError("New Button State must be a valid ButtonState!")
         if not self.is_state(new_state):
             self.set_state(new_state)
-            for style in self.__styles:
-                if style == new_state:
-                    self.__styles[style].activate()
-                    self.__styles[style].show()
+            for style_state, style in self.__styles.items():
+                if style_state == new_state:
+                    style.activate()
+                    style.show()
                 else:
-                    self.__styles[style].deactivate()
-                    self.__styles[style].hide()
+                    style.deactivate()
+                    style.hide()
     
     def render(self, screen):
         style = self.get_active_style()
