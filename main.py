@@ -6,6 +6,7 @@ from src.gameinterface import GameInterface
 from src.gameinterfacecomponent import GameInterfaceComponent
 from src.label import Label
 from src.box import Box
+from src.buttonstate import ButtonState
 from src.button import Button
 
 #globals
@@ -37,8 +38,8 @@ def init_menu_interface():
     menu_interface = GameInterface(priority=0)
 
     #menu title stuff
-    menu_box = Box(name="Menu_Box", priority=1, position=(250, 75), size=(300, 100), color=(100, 100, 100))
-    menu_title = Label(name="Menu_Title", priority=2, content="Main Menu", position=(300, 100), font_size=50)
+    menu_box = Box(name="Menu_Box", priority=1, position=(250, 50), size=(300, 100), color=(100, 100, 100))
+    menu_title = Label(name="Menu_Title", priority=2, content="Main Menu", position=(300, 75), font_size=50)
     menu_box.add_child(menu_title)
 
     #menu button stuff
@@ -48,9 +49,9 @@ def init_menu_interface():
     menu_button_hover = Box(name="Menu_Button_Hover", priority=1, position=(200, 400), size=(200, 50), color=(0, 0, 255))
     menu_button_active = Box(name="Menu_Button_Active", priority=1, position=(200, 400), size=(200, 50), color=(0, 0, 128))
     menu_button.set_label(menu_button_label)
-    menu_button.set_style(key="idle", style=menu_button_idle)
-    menu_button.set_style(key="hover", style=menu_button_hover)
-    menu_button.set_style(key="active", style=menu_button_active)
+    menu_button.set_style(key=ButtonState.IDLE, style=menu_button_idle)
+    menu_button.set_style(key=ButtonState.HOVER, style=menu_button_hover)
+    menu_button.set_style(key=ButtonState.ACTIVE, style=menu_button_active)
 
     #add components to interface
     menu_interface.add_component(menu_box)

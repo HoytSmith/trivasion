@@ -1,11 +1,12 @@
 import pygame
 from src.gameinterfacecomponent import GameInterfaceComponent
+from src.buttonstate import ButtonState
 from src.label import Label
 from src.box import Box
 
 class Button(GameInterfaceComponent):
     def __init__(self, name="Button", priority=0, position=(0,0), size=(10,10), callback=None, label=None, styles=None):
-        self.set_state("idle")
+        self.set_state(ButtonState.IDLE)
         self.reset_styles()
         self.set_callback(callback)
         self.set_label(label)
@@ -28,8 +29,8 @@ class Button(GameInterfaceComponent):
         return self.__label
     
     def set_state(self, state):
-        if not isinstance(state, str):
-            raise TypeError("Button state must be string!")
+        if not isinstance(state, ButtonState):
+            raise TypeError("Button State must be a valid ButtonState!")
         self.__state = state
     
     def get_state(self):
@@ -40,9 +41,9 @@ class Button(GameInterfaceComponent):
 
     def reset_styles(self):
         self.__styles = {
-            "idle" : None,
-            "hover" : None,
-            "active" : None
+            ButtonState.IDLE : None,
+            ButtonState.HOVER : None,
+            ButtonState.ACTIVE : None
         }
     
     def set_style(self, key, style):
@@ -65,11 +66,16 @@ class Button(GameInterfaceComponent):
     def get_styles(self):
         return self.__styles
     
-    def change_state(self, newstate):
-        if not self.is_state(newstate):
-            self.set_state(newstate)
+    def get_active_style(self):
+        return self.get_style(self.get_state())
+    
+    def change_state(self, new_state):
+        if not isinstance(new_state, ButtonState):
+            raise TypeError("New Button State must be a valid ButtonState!")
+        if not self.is_state(new_state):
+            self.set_state(new_state)
             for style in self.__styles:
-                if style == newstate:
+                if style == new_state:
                     self.__styles[style].activate()
                     self.__styles[style].show()
                 else:
@@ -77,8 +83,12 @@ class Button(GameInterfaceComponent):
                     self.__styles[style].hide()
     
     def render(self, screen):
-        self.get_style(self.get_state()).render(screen)
-        self.get_label().render(screen)
+        style = self.get_active_style()
+        label = self.get_label()
+        if style:
+            style.render(screen)
+        if label:
+            label.render(screen)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -87,12 +97,12 @@ class Button(GameInterfaceComponent):
                 return True
         elif event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONUP:
             if self.mouse_over(event.pos):
-                self.change_state("hover")
+                self.change_state(ButtonState.HOVER)
             else:
-                self.change_state("idle")
+                self.change_state(ButtonState.IDLE)
         return False
     
     def on_click(self):
-        if callable(self.get_callback()) and not self.is_state("active"):
+        if callable(self.get_callback()) and not self.is_state(ButtonState.ACTIVE):
             self.get_callback()()
-        self.change_state("active")
+        self.change_state(ButtonState.ACTIVE)
