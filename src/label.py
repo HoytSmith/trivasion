@@ -2,10 +2,10 @@ import pygame
 from src.gameinterfacecomponent import GameInterfaceComponent
 
 class Label(GameInterfaceComponent):
-    def __init__(self, name="Label", content="Text here...", position=(0,0), size=24, color=(255, 255, 255)):
-        super().__init__(name, position, size)
+    def __init__(self, name="Label", content="Text here...", position=(0,0), color=(255, 255, 255), font_size=24):
+        super().__init__(name=name, position=position, color=color)
         self.set_content(content)
-        self.set_color(color)
+        self.set_font_size(font_size)
         self.update_label()
     
     def set_content(self, content):
@@ -16,29 +16,16 @@ class Label(GameInterfaceComponent):
     def get_content(self):
         return self.__content
 
-    def set_size(self, size=24):
-        if not isinstance(size, int):
+    def set_font_size(self, font_size=24):
+        if not isinstance(font_size, int):
             raise TypeError("Label text size must be of type integer!")
-        self.__size = size
+        self.__font_size = font_size
     
-    def get_size(self):
-        return self.__size
-
-    def set_color(self, color=(255, 255, 255)):
-        if not isinstance(color, tuple) and len(color) != 3:
-            raise TypeError("Label text color must be a tuple with 3 values!")
-        for c in color:
-            if not isinstance(c, int):
-                raise TypeError("Label text color must contain integer values only!")
-            if c < 0 or c > 255:
-                raise ValueError("Label text color must contain values between 0 and 255!")
-        self.__color = color
-    
-    def get_color(self):
-        return self.__color
+    def get_font_size(self):
+        return self.__font_size
     
     def set_font(self):
-        self.__font = pygame.font.Font(None, self.get_size())
+        self.__font = pygame.font.Font(None, self.get_font_size())
     
     def get_font(self):
         return self.__font
@@ -58,7 +45,7 @@ class Label(GameInterfaceComponent):
         self.update_label()
     
     def update_size(self, size):
-        self.set_size(size)
+        self.set_font_size(size)
         self.update_label()
     
     def update_color(self, color):

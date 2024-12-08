@@ -33,7 +33,7 @@ def init_pygame():
 #(re)set main menu interface
 def init_menu_interface():
     menu_interface = GameInterface()
-    menu_title = Label("Menu_Title", "Main Menu", (300, 100), 50)
+    menu_title = Label(name="Menu_Title", content="Main Menu", position=(300, 100), font_size=50)
     menu_interface.add_component(menu_title)
     return menu_interface
 

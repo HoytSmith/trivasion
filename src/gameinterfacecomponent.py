@@ -1,10 +1,11 @@
 import pygame
 
 class GameInterfaceComponent():
-    def __init__(self, name="Component", position=(0,0), size=(10,10)):
+    def __init__(self, name="Component", position=(0,0), size=(10,10), color=(255,255,255)):
         self.set_name(name)
         self.set_position(position)
         self.set_size(size)
+        self.set_color(color)
         self.deactivate()
         self.hide()
     
@@ -69,6 +70,19 @@ class GameInterfaceComponent():
     def get_size(self):
         return self.__size
     
+    def set_color(self, color=(255, 255, 255)):
+        if not isinstance(color, tuple) and len(color) != 3:
+            raise TypeError("Component color must be a tuple with 3 values!")
+        for c in color:
+            if not isinstance(c, int):
+                raise TypeError("Component color must contain integer values only!")
+            if c < 0 or c > 255:
+                raise ValueError("Component color must contain values between 0 and 255!")
+        self.__color = color
+    
+    def get_color(self):
+        return self.__color
+
     def get_width(self):
         if len(self.__size) != 2:
             raise IndexError("Size is not properly set!")
@@ -82,7 +96,7 @@ class GameInterfaceComponent():
     def render(self, screen):
         #Render logic
         # Example: Draw a placeholder rectangle
-        pygame.draw.rect(screen, (200, 200, 200), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
+        pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
     
     def handle_event(self, event):
         # Example: Check if a mouse click is within the component
