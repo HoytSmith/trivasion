@@ -5,6 +5,8 @@ from src.gamestates import GameState
 from src.gameinterface import GameInterface
 from src.gameinterfacecomponent import GameInterfaceComponent
 from src.label import Label
+from src.box import Box
+from src.button import Button
 
 #globals
 game_is_running = True
@@ -32,22 +34,43 @@ def init_pygame():
 
 #(re)set main menu interface
 def init_menu_interface():
-    menu_interface = GameInterface()
-    menu_title = Label(name="Menu_Title", content="Main Menu", position=(300, 100), font_size=50)
-    menu_interface.add_component(menu_title)
+    menu_interface = GameInterface(priority=0)
+
+    #menu title stuff
+    menu_box = Box(name="Menu_Box", priority=1, position=(250, 75), size=(300, 100), color=(100, 100, 100))
+    menu_title = Label(name="Menu_Title", priority=2, content="Main Menu", position=(300, 100), font_size=50)
+    menu_box.add_child(menu_title)
+
+    #menu button stuff
+    menu_button = Button(name="Menu_Button", priority=0, position=(200, 400), size=(200, 50))
+    menu_button_label = Label(name="Menu_Button_Label", priority=2, content="Menu Button", position=(200, 400), color=(255, 255, 255), font_size=36)
+    menu_button_idle = Box(name="Menu_Button_Idle", priority=1, position=(200, 400), size=(200, 50), color=(0, 0, 200))
+    menu_button_hover = Box(name="Menu_Button_Hover", priority=1, position=(200, 400), size=(200, 50), color=(0, 0, 255))
+    menu_button_active = Box(name="Menu_Button_Active", priority=1, position=(200, 400), size=(200, 50), color=(0, 0, 128))
+    menu_button.set_label(menu_button_label)
+    menu_button.set_style(key="idle", style=menu_button_idle)
+    menu_button.set_style(key="hover", style=menu_button_hover)
+    menu_button.set_style(key="active", style=menu_button_active)
+
+    #add components to interface
+    menu_interface.add_component(menu_box)
+    menu_interface.add_component(menu_button)
     return menu_interface
 
 #(re)set gameplay interface
 def init_gameplay_interface():
-    return GameInterface()
+    gameplay_interface = GameInterface(priority=0)
+    return gameplay_interface
 
 #(re)set paused game interface overlay
 def init_gamepause_interface():
-    return GameInterface()
+    gamepause_interface = GameInterface(priority=10)
+    return gamepause_interface
 
 #(re)set game-over interface overlay
 def init_gameover_interface():
-    return GameInterface()
+    gameover_interface = GameInterface(priority=10)
+    return gameover_interface
 
 #(re)set all interfaces
 def init_interfaces():
