@@ -162,7 +162,10 @@ def handle_events():
             game_is_running = False
             return
         #Ensure only first frame of MOUSEBUTTONDOWN is processed
-        toggle_mouse_state = (event.type == pygame.MOUSEBUTTONDOWN and not mouse_button_held) or (event.type == pygame.MOUSEBUTTONUP and mouse_button_held)
+        toggle_mouse_state = (
+            (event.type == pygame.MOUSEBUTTONDOWN and not mouse_button_held) or 
+            (event.type == pygame.MOUSEBUTTONUP and mouse_button_held)
+        )
 
         for interface in interfaces.values():
             if interface.is_active():
@@ -201,7 +204,11 @@ def main():
         
         #limit tickrate
         clock.tick(game_settings.get_setting("fps_limit"))
+    quit_game()
 
+#called when game ends
+def quit_game():
+    pygame.quit()
 
 #ensure that main program is called
 if __name__ == "__main__":
