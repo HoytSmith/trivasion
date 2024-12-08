@@ -75,12 +75,13 @@ class Button(GameInterfaceComponent):
         if not self.is_state(new_state):
             self.set_state(new_state)
             for style_state, style in self.__styles.items():
-                if style_state == new_state:
-                    style.activate()
-                    style.show()
-                else:
-                    style.deactivate()
-                    style.hide()
+                if style:
+                    if style_state == new_state:
+                        style.activate()
+                        style.show()
+                    else:
+                        style.deactivate()
+                        style.hide()
     
     def render(self, screen):
         style = self.get_active_style()
