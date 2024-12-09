@@ -68,7 +68,7 @@ def init_menu_interface():
     menu_title_box = Box(name="Menu_Title_Box", priority=0, position=(0, 50), size=(800, 50), color=(100, 100, 100))
     menu_title_label = Label(name="Menu_Title_Label", priority=1, content="Main Menu", font_size=50)
     menu_title_box.position_component_relative(component=menu_title_label, position=(50,50), percent_flag=True,
-                                               horizontal_alignment=Alignment.MIDDLE, vertical_alignment=Alignment.MIDDLE)
+                                               h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE)
     menu_title_box.add_child(menu_title_label)
 
     #menu button stuff

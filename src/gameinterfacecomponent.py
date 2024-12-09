@@ -61,16 +61,15 @@ class GameInterfaceComponent():
     
     #positions the given component relative to this component
     #given position coordinates are treated as percentages if percent_flag = True
-    def position_component_relative(self, component, position = (0,0), percent_flag = False,
-                                    horizontal_alignment=Alignment.START, vertical_alignment=Alignment.START):
+    def position_component_relative(self, component, position = (0,0), percent_flag = False, h_align=Alignment.START, v_align=Alignment.START):
         #check validity of parameters
         if not isinstance(component, GameInterfaceComponent):
             raise TypeError("Component being positioned relatively must be of class GameInterfaceComponent or a subclass!")
-        if not (isinstance(horizontal_alignment, Alignment) and isinstance(vertical_alignment, Alignment)):
+        if not (isinstance(h_align, Alignment) and isinstance(v_align, Alignment)):
             raise TypeError("Alignments must be of class Alignment!")
         #setup relevant variables
         pos_x, pos_y = position
-        new_position = self.get_position()
+        new_x, new_y = self.get_position()
         self_w, self_h = self.get_size()
         comp_w, comp_h = component.get_size()
         #transform percentages into absolute coordinates
@@ -78,20 +77,18 @@ class GameInterfaceComponent():
             pos_x = round((pos_x/100) * self_w)
             pos_y = round((pos_y/100) * self_h)
         #apply alignments
-        if horizontal_alignment == Alignment.MIDDLE:
-            pos_x = round(pos_x - (comp_w/2))
-        if horizontal_alignment == Alignment.END:
-            pos_x = pos_x - comp_w
-        if vertical_alignment == Alignment.MIDDLE:
-            pos_y = round(pos_y - (comp_h/2))
-        if vertical_alignment == Alignment.END:
-            pos_y = pos_y - comp_h
+        if h_align == Alignment.MIDDLE:
+            pos_x -= round(comp_w/2)
+        if h_align == Alignment.END:
+            pos_x -= comp_w
+        if v_align == Alignment.MIDDLE:
+            pos_y -= round(comp_h/2)
+        if v_align == Alignment.END:
+            pos_y -= comp_h
         #apply results to component position
-        new_position = (
-            new_position[0] + pos_x,
-            new_position[1] + pos_y
-        )
-        component.set_position(new_position)
+        new_x += pos_x
+        new_y += pos_y
+        component.set_position((new_x, new_y))
 
     def get_x(self):
         if len(self.__position) != 2:
