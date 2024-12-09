@@ -71,6 +71,8 @@ def init_menu_interface():
                                                h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE)
     menu_title_box.add_child(menu_title_label)
 
+    #quick button test
+    menu_quick_button = Button.quick_create(name="Menu_Quick_Button", priority=0, text="Quick Button", position=(100, 300))
     #menu button stuff
     menu_start_button = Button(name="Menu_Start_Button", priority=0, position=(300, 400), size=(200, 50))
     menu_start_button_label = Label(name="Menu_Start_Button_Label", priority=2, content="Start Game", position=(325, 415), color=(255, 255, 255), font_size=36)
@@ -85,6 +87,7 @@ def init_menu_interface():
 
     #add components to interface
     menu_interface.add_component(menu_title_box)
+    menu_interface.add_component(menu_quick_button)
     menu_interface.add_component(menu_start_button)
     return menu_interface
 
