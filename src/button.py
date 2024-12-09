@@ -66,7 +66,7 @@ class Button(GameInterfaceComponent):
     def get_styles(self):
         return self.__styles
     
-    def get_active_style(self):
+    def get_current_style(self):
         return self.get_style(self.get_state())
     
     def change_state(self, new_state):
@@ -84,7 +84,7 @@ class Button(GameInterfaceComponent):
                         style.hide()
     
     def render(self, screen):
-        style = self.get_active_style()
+        style = self.get_current_style()
         label = self.get_label()
         if style:
             style.render(screen)
