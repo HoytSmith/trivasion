@@ -31,6 +31,8 @@ class Label(GameInterfaceComponent):
     
     def set_render(self):
         self.__render = self.get_font().render(self.get_content(), True, self.get_color())
+        #update size automatically based on render size
+        self.set_size(self.__render.get_rect().size)
     
     def get_render(self):
         return self.__render
