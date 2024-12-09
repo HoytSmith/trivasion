@@ -110,29 +110,27 @@ class Button(GameInterfaceComponent):
     
     @staticmethod
     def quick_create(name="Button", priority=0, text="Button", position=(0,0), text_color=(255, 255, 255), text_size=24, button_color=(0,0,1), callback=None):
+        def clamp_color_value(value=0):
+            if value > 0:
+                return 1
+            else:
+                return 0
+        def calc_style_colors(color=(0,0,0), intensity=0):
+            return (
+                clamp_color_value(color[0]) * intensity,
+                clamp_color_value(color[1]) * intensity,
+                clamp_color_value(color[2]) * intensity
+            )
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
         #setup style colors
-        r_val, g_val, b_val = button_color
         idle_intensity = 192    #buttons are moderately bright when idle
         hover_intensity = 255   #buttons are brightest when hovered over
         active_intensity = 128  #buttons are darkest when clicked
-        idle_colors = (
-            r_val*idle_intensity,
-            g_val*idle_intensity,
-            b_val*idle_intensity
-        )
-        hover_colors = (
-            r_val*hover_intensity,
-            g_val*hover_intensity,
-            b_val*hover_intensity
-        )
-        active_colors = (
-            r_val*active_intensity,
-            g_val*active_intensity,
-            b_val*active_intensity
-        )
+        idle_colors = calc_style_colors(button_color, idle_intensity)
+        hover_colors = calc_style_colors(button_color, hover_intensity)
+        active_colors = calc_style_colors(button_color, active_intensity)
         #create button styles
         idle = Box(name=f"{name}_Idle", priority=priority, position=position, size=label_size, color=idle_colors)
         hover = Box(name=f"{name}_Hover", priority=priority, position=position, size=label_size, color=hover_colors)
