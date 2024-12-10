@@ -112,17 +112,8 @@ class Button(GameInterfaceComponent):
     @staticmethod
     def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
                      size=(0,0), padding=(4,2), text_color=(255, 255, 255), text_size=36, button_color=(0,0,1), callback=None):
-        def clamp_color_value(value=0):
-            if value > 0:
-                return 1
-            else:
-                return 0
         def calc_style_colors(color=(0,0,0), intensity=0):
-            return (
-                clamp_color_value(color[0]) * intensity,
-                clamp_color_value(color[1]) * intensity,
-                clamp_color_value(color[2]) * intensity
-            )
+            return tuple((1 if c > 0 else 0) * intensity for c in color)
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
