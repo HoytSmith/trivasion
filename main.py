@@ -71,22 +71,26 @@ def init_menu_interface():
                                                h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE)
     menu_title_box.add_child(menu_title_label)
 
-    #menu button stuff
+    #menu buttons
     menu_start_button = Button.quick_create(
         name="Menu_Start_Button", 
-        priority=0, 
         text="Start Game", 
-        position=(300, 400), 
-        size=(200, 50), 
-        text_color=(255, 255, 255), 
-        text_size=36, 
-        button_color=(0,0,1), 
+        position=(400, 400), 
+        padding=(10,5), 
         callback=lambda: queue_state(GameState.PLAY)
     )
-    
+    menu_quit_button = Button.quick_create(
+        name="Menu_Quit_Button", 
+        text="Quit Game", 
+        position=(400, 500), 
+        padding=(10,5), 
+        callback=lambda: queue_state(GameState.QUIT)
+    )
+
     #add components to interface
     menu_interface.add_component(menu_title_box)
     menu_interface.add_component(menu_start_button)
+    menu_interface.add_component(menu_quit_button)
     return menu_interface
 
 #(re)set gameplay interface
@@ -102,13 +106,9 @@ def init_gameplay_interface():
     #gameplay button stuff
     gameplay_return_button = Button.quick_create(
         name="Gameplay_Return_Button", 
-        priority=0, 
         text="Return to Main Menu", 
         position=(250, 400), 
-        size=(300, 50), 
-        text_color=(255, 255, 255), 
-        text_size=36, 
-        button_color=(0,0,1), 
+        padding=(10,5), 
         callback=lambda: queue_state(GameState.START)
     )
 
@@ -130,12 +130,9 @@ def init_gamepause_interface():
     #gameplay button stuff
     gamepause_resume_button = Button.quick_create(
         name="Gamepause_Resume_Button", 
-        priority=0, 
         text="Resume Game", 
-        position=(300, 300), 
-        size=(200, 50), 
-        text_color=(255, 255, 255), 
-        text_size=36, 
+        position=(400, 300), 
+        padding=(10,5), 
         button_color=(0,1,0), 
         callback=lambda: queue_state(GameState.PLAY)
     )
@@ -172,7 +169,7 @@ def queue_state(new_state):
 
 #direct gameflow
 def change_state(new_state):
-    global current_state
+    global game_is_running, current_state
 
     #quick check to see if this is even necessary
     if current_state == new_state:
@@ -186,7 +183,9 @@ def change_state(new_state):
 
     #switch to new state
     current_state = new_state
-    if current_state == GameState.START:
+    if current_state == GameState.QUIT:
+        game_is_running = False
+    elif current_state == GameState.START:
         init_game()
     elif current_state == GameState.MENU:
         menu.show()
