@@ -124,13 +124,7 @@ class Button(GameInterfaceComponent):
                 clamp_color_value(color[2]) * intensity
             )
         def calc_button_size(button_size = (0,0), label_size = (0,0)):
-            button_w, button_h = button_size
-            label_w, label_h = label_size
-            if label_w > button_w:
-                button_w = label_w
-            if label_h > button_h:
-                button_h = label_h
-            return (button_w, button_h)
+            return ( max( button_size[0], label_size[0] ) , max( button_size[1], label_size[1] ) )
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
