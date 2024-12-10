@@ -119,4 +119,4 @@ class Box(GameInterfaceComponent):
         text_box = Box(name=name, priority=priority, position=box_pos, size=box_size, color=box_color, children=[label])
         #correctly center the label within the button
         text_box.position_component_relative(component=label, position=(50,50), percent_flag=True, h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE)
-        return None
+        return text_box
