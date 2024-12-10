@@ -31,6 +31,13 @@ class Box(GameInterfaceComponent):
         for child in self.__children:
             child.show()
     
+    def move(self, movement=(0,0)):
+        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
+            raise TypeError("Movement must be a tuple containing 2 integers!")
+        for child in self.__children:
+            child.move(movement)
+        super().move(movement)
+    
     def set_alpha(self, alpha):
         if not (isinstance(alpha, int) and alpha >= 0 and alpha <= 255):
             raise TypeError("Alpha must be an integer of at least 0 and at most 255!")

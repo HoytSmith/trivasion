@@ -14,6 +14,14 @@ class Button(GameInterfaceComponent):
         self.set_styles(styles)
         super().__init__(name=name, priority=priority, position=position, size=size)
     
+    def move(self, movement=(0,0)):
+        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
+            raise TypeError("Movement must be a tuple containing 2 integers!")
+        self.__label.move(movement)
+        for style in self.__styles:
+            style.move(movement)
+        super().move(movement)
+
     def set_callback(self, callback):
         self.__callback = callback
     
