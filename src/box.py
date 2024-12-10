@@ -1,5 +1,7 @@
 import pygame
 from src.gameinterfacecomponent import GameInterfaceComponent
+from src.alignment import Alignment
+from src.label import Label
 
 class Box(GameInterfaceComponent):
     def __init__(self, name="Box", priority=0, position=(0,0), size=(10,10), color=(255, 255, 255), children=None):
@@ -90,3 +92,31 @@ class Box(GameInterfaceComponent):
                     break
         # Boxes themselves are non-interactive
         return False
+    
+    @staticmethod
+    def create_text_box(name="Text_Box", priority=0, text="Text Box", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
+                        size=(0,0), padding=(4,2), box_color=(128,128,128), text_color=(255, 255, 255), text_size=36):
+        #create button label
+        label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
+        label_size = label.get_size()
+        #prepare sizing
+        box_size = (
+            max(size[0], label_size[0]+(padding[0]*2)),
+            max(size[1], label_size[1]+(padding[1]*2))
+        )
+        #prepare positioning
+        box_pos_x, box_pos_y = position
+        if h_align == Alignment.MIDDLE:
+            box_pos_x -= round(box_size[0]/2)
+        if h_align == Alignment.END:
+            box_pos_x -= box_size[0]
+        if v_align == Alignment.MIDDLE:
+            box_pos_y -= round(box_size[1]/2)
+        if v_align == Alignment.END:
+            box_pos_y -= box_size[1]
+        box_pos = (box_pos_x, box_pos_y)
+        #create the button
+        text_box = Box(name=name, priority=priority, position=box_pos, size=box_size, color=box_color, children=[label])
+        #correctly center the label within the button
+        text_box.position_component_relative(component=label, position=(50,50), percent_flag=True, h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE)
+        return None
