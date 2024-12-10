@@ -110,8 +110,8 @@ class Button(GameInterfaceComponent):
         self.change_state(ButtonState.ACTIVE)
     
     @staticmethod
-    def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.START, v_align=Alignment.START, 
-                     size=(0,0), padding=(0,0), text_color=(255, 255, 255), text_size=24, button_color=(0,0,1), callback=None):
+    def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
+                     size=(0,0), padding=(4,2), text_color=(255, 255, 255), text_size=36, button_color=(0,0,1), callback=None):
         def clamp_color_value(value=0):
             if value > 0:
                 return 1
@@ -128,8 +128,8 @@ class Button(GameInterfaceComponent):
         label_size = label.get_size()
         #prepare sizing
         button_size = (
-            max(size[0], label_size[0]+padding[0]),
-            max(size[1], label_size[1]+padding[1])
+            max(size[0], label_size[0]+(padding[0]*2)),
+            max(size[1], label_size[1]+(padding[1]*2))
         )
         #prepare positioning
         btn_pos_x, btn_pos_y = position
