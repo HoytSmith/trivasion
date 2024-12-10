@@ -4,10 +4,11 @@ from src.alignment import Alignment
 from src.label import Label
 
 class Box(GameInterfaceComponent):
-    def __init__(self, name="Box", priority=0, position=(0,0), size=(10,10), color=(255, 255, 255), children=None):
+    def __init__(self, name="Box", priority=0, position=(0,0), size=(10,10), color=(255, 255, 255), alpha=255, children=None):
         self.reset_children()
         if children:
             self.add_children(children)
+        self.set_alpha(alpha)
         super().__init__(name=name, priority=priority, position=position, size=size, color=color)
     
     def deactivate(self):
@@ -29,6 +30,18 @@ class Box(GameInterfaceComponent):
         super().show()
         for child in self.__children:
             child.show()
+    
+    def set_alpha(self, alpha):
+        if not (isinstance(alpha, int) and alpha >= 0 and alpha <= 255):
+            raise TypeError("Alpha must be an integer of at least 0 and at most 255!")
+        self.__alpha = alpha
+
+    def get_alpha(self):
+        return self.__alpha
+    
+    def update_alpha(self, alpha):
+        self.set_alpha(alpha)
+        self.update_component()
 
     def reset_children(self):
         self.__children = []
@@ -76,9 +89,18 @@ class Box(GameInterfaceComponent):
             if child:
                 children.append(child)
         return children
+    
+    def set_surface(self):
+        self.__surface = pygame.Surface(self.get_size(), pygame.SRCALPHA)
+        self.__surface.fill((*self.get_color(), self.get_alpha()))
+    
+    def get_surface(self):
+        return self.__surface
 
     def render(self, screen):
-        pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
+        #OLD RENDERING KEPT UNTIL PROPERLY IMPLEMENTED NEW RENDERING - JUST IN CASE
+        #pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
+        screen.blit(self.get_surface(), self.get_position())
         #Children should be rendered after the box itself
         for child in self.__children:
             if child.is_visible():
@@ -93,6 +115,10 @@ class Box(GameInterfaceComponent):
         # Boxes themselves are non-interactive
         return False
     
+    def update_component(self):
+        self.set_surface()
+        super().update_component()
+
     @staticmethod
     def create_text_box(name="Text_Box", priority=0, text="Text Box", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
                         size=(0,0), padding=(4,2), box_color=(128,128,128), text_color=(255, 255, 255), text_size=36):

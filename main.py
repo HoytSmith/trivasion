@@ -186,7 +186,8 @@ def init_gamepause_interface():
             screen_positions["right"], 
             screen_positions["bottom"]
         ), 
-        color = (0,0,0)
+        color = (0, 0, 0),
+        alpha = 128
     )
 
     #gamepause title stuff
@@ -248,7 +249,8 @@ def init_gameover_interface():
             screen_positions["right"], 
             screen_positions["bottom"]
         ), 
-        color = (0,0,0)
+        color = (0, 0, 0),
+        alpha = 128
     )
 
     #gamepause title stuff
