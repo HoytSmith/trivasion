@@ -65,32 +65,51 @@ def init_menu_interface():
     menu_interface = GameInterface(priority=0)
 
     #menu title stuff
-    menu_title_box = Box(name="Menu_Title_Box", priority=0, position=(0, 50), size=(800, 50), color=(100, 100, 100))
-    menu_title_label = Label(name="Menu_Title_Label", priority=1, content="Main Menu", font_size=50)
-    menu_title_box.position_component_relative(component=menu_title_label, position=(50,50), percent_flag=True,
-                                               h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE)
-    menu_title_box.add_child(menu_title_label)
+    menu_title_box = Box.create_text_box(
+        name = "Menu_Title_Box", 
+        text = "Main Menu", 
+        position = (
+            screen_positions["center_x"], 
+            50
+        ), 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["right"], 
+            50
+        ), 
+        padding = (10, 5), 
+        box_color = (100, 100, 100), 
+        text_size = 50
+    )
 
     #menu buttons
     menu_start_button = Button.quick_create(
-        name="Menu_Start_Button", 
-        text="Start Game", 
-        position=(400, 400), 
-        padding=(10,5), 
-        callback=lambda: queue_state(GameState.PLAY)
+        name = "Menu_Start_Button", 
+        text = "Start Game", 
+        position = (
+            screen_positions["center_x"], 
+            screen_positions["center_y"]
+        ), 
+        padding = (10, 5), 
+        callback = lambda: queue_state(GameState.PLAY)
     )
     menu_quit_button = Button.quick_create(
-        name="Menu_Quit_Button", 
-        text="Quit Game", 
-        position=(400, 500), 
-        padding=(10,5), 
-        callback=lambda: queue_state(GameState.QUIT)
+        name = "Menu_Quit_Button", 
+        text = "Quit Game", 
+        position = (
+            screen_positions["center_x"], 
+            screen_positions["center_y"]+100
+        ), 
+        padding = (10, 5), 
+        callback = lambda: queue_state(GameState.QUIT)
     )
 
     #add components to interface
-    menu_interface.add_component(menu_title_box)
-    menu_interface.add_component(menu_start_button)
-    menu_interface.add_component(menu_quit_button)
+    menu_interface.add_components([
+        menu_title_box, 
+        menu_start_button, 
+        menu_quit_button
+    ])
     return menu_interface
 
 #(re)set gameplay interface
@@ -99,22 +118,55 @@ def init_gameplay_interface():
     gameplay_interface = GameInterface(priority=0)
 
     #gameplay title stuff
-    gameplay_title_box = Box(name="Gameplay_Title_Box", priority=0, position=(250, 50), size=(300, 100), color=(100, 100, 100))
-    gameplay_title_label = Label(name="Gameplay_Title_Label", priority=1, content="Gameplay", position=(300, 75), font_size=50)
-    gameplay_title_box.add_child(gameplay_title_label)
+    gameplay_title_box = Box.create_text_box(
+        name = "Gameplay_Title_Box", 
+        text = "Gameplay", 
+        position = (
+            screen_positions["center_x"], 
+            50
+        ), 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["right"], 
+            50
+        ), 
+        padding = (10, 5), 
+        box_color = (100, 100, 100), 
+        text_size = 50
+    )
 
     #gameplay button stuff
+    gameplay_win_button = Button.quick_create(
+        name = "Gameplay_Win_Button", 
+        text = "Win the Game", 
+        position = (
+            screen_positions["center_x"]-50, 
+            screen_positions["bottom"]-100
+        ), 
+        h_align = Alignment.END,
+        v_align = Alignment.END, 
+        padding = (10, 5), 
+        callback = lambda: queue_state(GameState.END)
+    )
     gameplay_return_button = Button.quick_create(
-        name="Gameplay_Return_Button", 
-        text="Return to Main Menu", 
-        position=(250, 400), 
-        padding=(10,5), 
-        callback=lambda: queue_state(GameState.START)
+        name = "Gameplay_Return_Button", 
+        text = "Return to Main Menu", 
+        position = (
+            screen_positions["center_x"]+50, 
+            screen_positions["bottom"]-100
+        ), 
+        h_align = Alignment.START,
+        v_align = Alignment.END, 
+        padding = (10, 5), 
+        callback = lambda: queue_state(GameState.START)
     )
 
     #add components to interface
-    gameplay_interface.add_component(gameplay_title_box)
-    gameplay_interface.add_component(gameplay_return_button)
+    gameplay_interface.add_components([
+        gameplay_title_box,
+        gameplay_win_button,
+        gameplay_return_button
+    ])
     return gameplay_interface
 
 #(re)set paused game interface overlay
@@ -122,30 +174,123 @@ def init_gamepause_interface():
     global screen_positions
     gamepause_interface = GameInterface(priority=10)
 
-    #gameplay title stuff
-    gamepause_title_box = Box(name="Gamepause_Title_Box", priority=0, position=(250, 150), size=(300, 100), color=(100, 100, 100))
-    gamepause_title_label = Label(name="Gamepause_Title_Label", priority=1, content="Game Paused", position=(300, 175), font_size=50)
-    gamepause_title_box.add_child(gamepause_title_label)
+    #gamepause screen overlay
+    gamepause_background_box = Box(
+        name = "Gamepause_Background", 
+        priority = 0, 
+        position = (
+            screen_positions["left"], 
+            screen_positions["top"]
+        ), 
+        size = (
+            screen_positions["right"], 
+            screen_positions["bottom"]
+        ), 
+        color = (0,0,0)
+    )
+
+    #gamepause title stuff
+    gamepause_title_box = Box.create_text_box(
+        name = "Gamepause_Title_Box", 
+        priority = 1, 
+        text = "Game Paused", 
+        position = (
+            screen_positions["center_x"], 
+            50
+        ), 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["right"], 
+            50
+        ), 
+        padding = (10, 5), 
+        box_color = (64, 64, 64), 
+        text_color = (200, 200, 200),
+        text_size = 50
+    )
 
     #gameplay button stuff
     gamepause_resume_button = Button.quick_create(
-        name="Gamepause_Resume_Button", 
-        text="Resume Game", 
-        position=(400, 300), 
-        padding=(10,5), 
-        button_color=(0,1,0), 
-        callback=lambda: queue_state(GameState.PLAY)
+        name = "Gamepause_Resume_Button", 
+        priority = 1, 
+        text = "Resume Game", 
+        position = (
+            screen_positions["center_x"], 
+            screen_positions["center_y"] 
+        ), 
+        padding = (10, 5), 
+        button_color = (0, 1, 0), 
+        callback = lambda: queue_state(GameState.PLAY)
     )
     
     #add components to interface
-    gamepause_interface.add_component(gamepause_title_box)
-    gamepause_interface.add_component(gamepause_resume_button)
+    gamepause_interface.add_components([
+        gamepause_background_box,
+        gamepause_title_box,
+        gamepause_resume_button
+    ])
     return gamepause_interface
 
 #(re)set game-over interface overlay
 def init_gameover_interface():
     global screen_positions
     gameover_interface = GameInterface(priority=10)
+
+    #gamepause screen overlay
+    gameover_background_box = Box(
+        name = "Gameover_Background", 
+        priority = 0, 
+        position = (
+            screen_positions["left"], 
+            screen_positions["top"]
+        ), 
+        size = (
+            screen_positions["right"], 
+            screen_positions["bottom"]
+        ), 
+        color = (0,0,0)
+    )
+
+    #gamepause title stuff
+    gameover_title_box = Box.create_text_box(
+        name = "Gameover_Title_Box", 
+        priority = 1, 
+        text = "Game Over", 
+        position = (
+            screen_positions["center_x"], 
+            50
+        ), 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["right"], 
+            50
+        ), 
+        padding = (10, 5), 
+        box_color = (64, 64, 64), 
+        text_color = (200, 200, 200),
+        text_size = 50
+    )
+
+    #gameplay button stuff
+    gameover_retry_button = Button.quick_create(
+        name = "Gameover_Retry_Button", 
+        priority = 1, 
+        text = "Try Again", 
+        position = (
+            screen_positions["center_x"], 
+            screen_positions["center_y"] 
+        ), 
+        padding = (10, 5), 
+        button_color = (0, 1, 0), 
+        callback = lambda: queue_state(GameState.START)
+    )
+
+    #add components to interface
+    gameover_interface.add_components([
+        gameover_background_box,
+        gameover_title_box,
+        gameover_retry_button
+    ])
     return gameover_interface
 
 #(re)set all interfaces
