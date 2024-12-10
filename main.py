@@ -71,23 +71,21 @@ def init_menu_interface():
                                                h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE)
     menu_title_box.add_child(menu_title_label)
 
-    #quick button test
-    menu_quick_button = Button.quick_create(name="Menu_Quick_Button", priority=0, text="Quick Button", position=(100, 300), size=(200, 50))
     #menu button stuff
-    menu_start_button = Button(name="Menu_Start_Button", priority=0, position=(300, 400), size=(200, 50))
-    menu_start_button_label = Label(name="Menu_Start_Button_Label", priority=2, content="Start Game", position=(325, 415), color=(255, 255, 255), font_size=36)
-    menu_start_button_idle = Box(name="Menu_Start_Button_Idle", priority=1, position=(300, 400), size=(200, 50), color=(0, 0, 200))
-    menu_start_button_hover = Box(name="Menu_Start_Button_Hover", priority=1, position=(300, 400), size=(200, 50), color=(0, 0, 255))
-    menu_start_button_active = Box(name="Menu_Start_Button_Active", priority=1, position=(300, 400), size=(200, 50), color=(0, 0, 128))
-    menu_start_button.set_label(menu_start_button_label)
-    menu_start_button.set_style(key=ButtonState.IDLE, style=menu_start_button_idle)
-    menu_start_button.set_style(key=ButtonState.HOVER, style=menu_start_button_hover)
-    menu_start_button.set_style(key=ButtonState.ACTIVE, style=menu_start_button_active)
-    menu_start_button.set_callback(lambda: queue_state(GameState.PLAY))
-
+    menu_start_button = Button.quick_create(
+        name="Menu_Start_Button", 
+        priority=0, 
+        text="Start Game", 
+        position=(300, 400), 
+        size=(200, 50), 
+        text_color=(255, 255, 255), 
+        text_size=36, 
+        button_color=(0,0,1), 
+        callback=lambda: queue_state(GameState.PLAY)
+    )
+    
     #add components to interface
     menu_interface.add_component(menu_title_box)
-    menu_interface.add_component(menu_quick_button)
     menu_interface.add_component(menu_start_button)
     return menu_interface
 
@@ -102,20 +100,21 @@ def init_gameplay_interface():
     gameplay_title_box.add_child(gameplay_title_label)
 
     #gameplay button stuff
-    gameplay_quit_button = Button(name="Gameplay_Quit_Button", priority=0, position=(300, 400), size=(200, 50))
-    gameplay_quit_button_label = Label(name="Gameplay_Quit_Button_Label", priority=2, content="Quit Game", position=(325, 415), color=(255, 255, 255), font_size=36)
-    gameplay_quit_button_idle = Box(name="Gameplay_Quit_Button_Idle", priority=1, position=(300, 400), size=(200, 50), color=(0, 0, 200))
-    gameplay_quit_button_hover = Box(name="Gameplay_Quit_Button_Hover", priority=1, position=(300, 400), size=(200, 50), color=(0, 0, 255))
-    gameplay_quit_button_active = Box(name="Gameplay_Quit_Button_Active", priority=1, position=(300, 400), size=(200, 50), color=(0, 0, 128))
-    gameplay_quit_button.set_label(gameplay_quit_button_label)
-    gameplay_quit_button.set_style(key=ButtonState.IDLE, style=gameplay_quit_button_idle)
-    gameplay_quit_button.set_style(key=ButtonState.HOVER, style=gameplay_quit_button_hover)
-    gameplay_quit_button.set_style(key=ButtonState.ACTIVE, style=gameplay_quit_button_active)
-    gameplay_quit_button.set_callback(lambda: queue_state(GameState.START))
+    gameplay_return_button = Button.quick_create(
+        name="Gameplay_Return_Button", 
+        priority=0, 
+        text="Return to Main Menu", 
+        position=(250, 400), 
+        size=(300, 50), 
+        text_color=(255, 255, 255), 
+        text_size=36, 
+        button_color=(0,0,1), 
+        callback=lambda: queue_state(GameState.START)
+    )
 
     #add components to interface
     gameplay_interface.add_component(gameplay_title_box)
-    gameplay_interface.add_component(gameplay_quit_button)
+    gameplay_interface.add_component(gameplay_return_button)
     return gameplay_interface
 
 #(re)set paused game interface overlay
@@ -129,17 +128,18 @@ def init_gamepause_interface():
     gamepause_title_box.add_child(gamepause_title_label)
 
     #gameplay button stuff
-    gamepause_resume_button = Button(name="Gameplay_Resume_Button", priority=0, position=(300, 300), size=(200, 50))
-    gamepause_resume_button_label = Label(name="Gameplay_Resume_Button_Label", priority=2, content="Resume Game", position=(325, 315), color=(255, 255, 255), font_size=36)
-    gamepause_resume_button_idle = Box(name="Gameplay_Resume_Button_Idle", priority=1, position=(300, 300), size=(200, 50), color=(0, 200, 0))
-    gamepause_resume_button_hover = Box(name="Gameplay_Resume_Button_Hover", priority=1, position=(300, 300), size=(200, 50), color=(0, 255, 0))
-    gamepause_resume_button_active = Box(name="Gameplay_Resume_Button_Active", priority=1, position=(300, 300), size=(200, 50), color=(0, 128, 0))
-    gamepause_resume_button.set_label(gamepause_resume_button_label)
-    gamepause_resume_button.set_style(key=ButtonState.IDLE, style=gamepause_resume_button_idle)
-    gamepause_resume_button.set_style(key=ButtonState.HOVER, style=gamepause_resume_button_hover)
-    gamepause_resume_button.set_style(key=ButtonState.ACTIVE, style=gamepause_resume_button_active)
-    gamepause_resume_button.set_callback(lambda: queue_state(GameState.PLAY))
-
+    gamepause_resume_button = Button.quick_create(
+        name="Gamepause_Resume_Button", 
+        priority=0, 
+        text="Resume Game", 
+        position=(300, 300), 
+        size=(200, 50), 
+        text_color=(255, 255, 255), 
+        text_size=36, 
+        button_color=(0,1,0), 
+        callback=lambda: queue_state(GameState.PLAY)
+    )
+    
     #add components to interface
     gamepause_interface.add_component(gamepause_title_box)
     gamepause_interface.add_component(gamepause_resume_button)
