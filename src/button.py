@@ -123,13 +123,14 @@ class Button(GameInterfaceComponent):
                 clamp_color_value(color[1]) * intensity,
                 clamp_color_value(color[2]) * intensity
             )
-        def calc_button_size(button_size = (0,0), label_size = (0,0)):
-            return ( max( button_size[0], label_size[0] ) , max( button_size[1], label_size[1] ) )
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
         #prepare sizing
-        button_size = calc_button_size(size, label_size)
+        button_size = (
+            max(size[0], label_size[0]),
+            max(size[1], label_size[1])
+        )
         #setup style colors
         idle_intensity = 192    #buttons are moderately bright when idle
         hover_intensity = 255   #buttons are brightest when hovered over
