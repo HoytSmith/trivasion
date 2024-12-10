@@ -105,8 +105,6 @@ class Box(GameInterfaceComponent):
         return self.__surface
 
     def render(self, screen):
-        #OLD RENDERING KEPT UNTIL PROPERLY IMPLEMENTED NEW RENDERING - JUST IN CASE
-        #pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
         screen.blit(self.get_surface(), self.get_position())
         #Children should be rendered after the box itself
         for child in self.__children:
