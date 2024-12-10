@@ -110,8 +110,8 @@ class Button(GameInterfaceComponent):
         self.change_state(ButtonState.ACTIVE)
     
     @staticmethod
-    def quick_create(name="Button", priority=0, text="Button", position=(0,0), size=(0,0), text_color=(255, 255, 255), 
-                     text_size=24, button_color=(0,0,1), callback=None):
+    def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.START, v_align=Alignment.START, 
+                     size=(0,0), padding=(0,0), text_color=(255, 255, 255), text_size=24, button_color=(0,0,1), callback=None):
         def clamp_color_value(value=0):
             if value > 0:
                 return 1
@@ -128,9 +128,20 @@ class Button(GameInterfaceComponent):
         label_size = label.get_size()
         #prepare sizing
         button_size = (
-            max(size[0], label_size[0]),
-            max(size[1], label_size[1])
+            max(size[0], label_size[0]+padding[0]),
+            max(size[1], label_size[1]+padding[1])
         )
+        #prepare positioning
+        btn_pos_x, btn_pos_y = position
+        if h_align == Alignment.MIDDLE:
+            btn_pos_x -= round(button_size[0]/2)
+        if h_align == Alignment.END:
+            btn_pos_x -= button_size[0]
+        if v_align == Alignment.MIDDLE:
+            btn_pos_y -= round(button_size[1]/2)
+        if v_align == Alignment.END:
+            btn_pos_y -= button_size[1]
+        button_pos = (btn_pos_x, btn_pos_y)
         #setup style colors
         idle_intensity = 192    #buttons are moderately bright when idle
         hover_intensity = 255   #buttons are brightest when hovered over
@@ -139,11 +150,11 @@ class Button(GameInterfaceComponent):
         hover_colors = calc_style_colors(button_color, hover_intensity)
         active_colors = calc_style_colors(button_color, active_intensity)
         #create button styles
-        idle = Box(name=f"{name}_Idle", priority=priority, position=position, size=button_size, color=idle_colors)
-        hover = Box(name=f"{name}_Hover", priority=priority, position=position, size=button_size, color=hover_colors)
-        active = Box(name=f"{name}_Active", priority=priority, position=position, size=button_size, color=active_colors)
+        idle = Box(name=f"{name}_Idle", priority=priority, position=button_pos, size=button_size, color=idle_colors)
+        hover = Box(name=f"{name}_Hover", priority=priority, position=button_pos, size=button_size, color=hover_colors)
+        active = Box(name=f"{name}_Active", priority=priority, position=button_pos, size=button_size, color=active_colors)
         #create the button
-        button = Button(name=name, priority=priority, position=position, size=button_size, callback=callback, label=label, styles={
+        button = Button(name=name, priority=priority, position=button_pos, size=button_size, callback=callback, label=label, styles={
             ButtonState.IDLE: idle,
             ButtonState.HOVER: hover,
             ButtonState.ACTIVE: active
