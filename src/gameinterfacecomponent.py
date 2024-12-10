@@ -103,7 +103,10 @@ class GameInterfaceComponent():
     def move(self, movement=(0,0)):
         if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
             raise TypeError("Movement must be a tuple containing 2 integers!")
-        self.set_position(self.get_x()+movement[0], self.get_y()+movement[1])
+        self.set_position((
+            round(self.get_x() + movement[0]), 
+            round(self.get_y() + movement[1])
+        ))
         self.update_component()
 
     def set_size(self, size=(10,10)):
