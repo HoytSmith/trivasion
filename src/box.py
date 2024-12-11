@@ -8,9 +8,10 @@ class Box(GameInterfaceComponent):
         self.reset_children()
         if children:
             self.add_children(children)
-        self.set_alpha(alpha)
-        super().__init__(name=name, priority=priority, position=position, size=size, color=color)
+        super().__init__(name=name, priority=priority, position=position, size=size, color=color, alpha=alpha)
     
+    #SETTERS, GETTERS AND OTHER CLASS METHODS:
+    #ACTIVITY METHODS:
     def deactivate(self):
         super().deactivate()
         for child in self.__children:
@@ -20,7 +21,8 @@ class Box(GameInterfaceComponent):
         super().activate()
         for child in self.__children:
             child.activate()
-
+    
+    #VISIBILITY METHODS:
     def hide(self):
         super().hide()
         for child in self.__children:
@@ -31,20 +33,12 @@ class Box(GameInterfaceComponent):
         for child in self.__children:
             child.show()
     
-    def set_alpha(self, alpha):
-        if not (isinstance(alpha, int) and alpha >= 0 and alpha <= 255):
-            raise TypeError("Alpha must be an integer of at least 0 and at most 255!")
-        self.__alpha = alpha
-
-    def get_alpha(self):
-        return self.__alpha
-
+    #CHILD METHODS:
     def reset_children(self):
         self.__children = []
 
     def add_child(self, child, sort=True):
-        if not isinstance(child, GameInterfaceComponent):
-            raise TypeError("Child must be object of GameInterfaceComponent class or subclass!")
+        self.validate_component(child)
         self.__children.append(child)
         if sort:
             self.sort_children()
@@ -56,8 +50,7 @@ class Box(GameInterfaceComponent):
         self.sort_children()
     
     def remove_child(self, child, sort=True):
-        if not isinstance(child, GameInterfaceComponent):
-            raise TypeError("Child must be object of GameInterfaceComponent class or subclass!")
+        self.validate_component(child)
         if child in self.__children:
             self.__children.remove(child)
         if sort:
@@ -86,15 +79,9 @@ class Box(GameInterfaceComponent):
                 children.append(child)
         return children
     
-    def set_surface(self):
-        self.__surface = pygame.Surface(self.get_size(), pygame.SRCALPHA)
-        self.__surface.fill((*self.get_color(), self.get_alpha()))
-    
-    def get_surface(self):
-        return self.__surface
-
+    #GAMELOOP METHODS:
     def render(self, screen):
-        screen.blit(self.get_surface(), self.get_position())
+        super().render(screen)
         #Children should be rendered after the box itself
         for child in self.__children:
             if child.is_visible():
@@ -105,12 +92,12 @@ class Box(GameInterfaceComponent):
         for child in self.__children:
             if child.is_active():
                 if child.handle_event(event, mouse_button_held):
-                    break
+                    return True
         # Boxes themselves are non-interactive
         return False
     
+    #MAIN UPDATE METHOD
     def update_component(self):
-        self.set_surface()
         for child in self.__children:
             child.update_component()
         super().update_component()
@@ -118,23 +105,23 @@ class Box(GameInterfaceComponent):
     # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
     # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
     # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
-    def move(self, movement=(0,0), update_component = True):
-        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
-            raise TypeError("Movement must be a tuple containing 2 integers!")
+    def update_position(self, new_position, relative = False, update_component = True):
         for child in self.__children:
-            child.move(movement, False)
-        super().move(movement, update_component)
+            child.update_position(new_position=new_position, relative=relative, update_component=False)
+        super().update_position(new_position=new_position, relative=relative, update_component=update_component)
+    
+    def move(self, movement=(0,0), update_component = True):
+        self.update_position(movement, relative=True, update_component=update_component)
 
     def update_alpha(self, alpha, propogate_children = False, update_component = True):
-        if not (isinstance(alpha, int) and alpha >= 0 and alpha <= 255):
-            raise TypeError("Alpha must be an integer of at least 0 and at most 255!")
-        self.set_alpha(alpha)
         if propogate_children:
             for child in self.__children:
                 if (hasattr(child, "update_alpha") and callable(getattr(child, "update_alpha"))):
-                    child.update_alpha(alpha, update_component=False)
-        if update_component:
-            self.update_component()
+                    if hasattr(child, "__children") or hasattr(child, "__styles"):
+                        child.update_alpha(alpha, propogate_children=propogate_children, update_component=False)
+                    else:
+                        child.update_alpha(alpha, update_component=False)
+        super().update_alpha(alpha, update_component=update_component)
 
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
