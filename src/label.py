@@ -12,6 +12,8 @@ class Label(GameInterfaceComponent):
     def validate_content(self, content):
         if not isinstance(content, str):
             raise TypeError("Label text content must be of type string!")
+        if content == "":
+            raise ValueError("Label text content can not be empty!")
     
     def validate_alpha(self, alpha):
         if not isinstance(alpha, int):
