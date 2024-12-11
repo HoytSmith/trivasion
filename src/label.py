@@ -17,7 +17,7 @@ class Label(GameInterfaceComponent):
 
     def set_font_size(self, font_size=24):
         if not isinstance(font_size, int):
-            raise TypeError("Label text size must be of type integer!")
+            raise TypeError("Label font size must be of type integer!")
         self.__font_size = font_size
     
     def get_font_size(self):
@@ -50,11 +50,19 @@ class Label(GameInterfaceComponent):
         self.set_render()
         super().update_component()
     
-    #THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
-    def update_content(self, content):
+    # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
+    # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
+    # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
+    def update_content(self, content, update_component = True):
+        if not isinstance(content, str):
+            raise TypeError("Label text content must be of type string!")
         self.set_content(content)
-        self.update_component()
+        if update_component:
+            self.update_component()
     
-    def update_size(self, size):
-        self.set_font_size(size)
-        self.update_component()
+    def update_font_size(self, font_size, update_component = True):
+        if not isinstance(font_size, int):
+            raise TypeError("Label font size must be of type integer!")
+        self.set_font_size(font_size)
+        if update_component:
+            self.update_component()

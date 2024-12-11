@@ -174,20 +174,29 @@ class GameInterfaceComponent():
     def update_component(self):
         self.calculate_boundaries()
 
-    #THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
-    def move(self, movement=(0,0)):
+    # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
+    # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
+    # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
+    def move(self, movement=(0,0), update_component = True):
         if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
             raise TypeError("Movement must be a tuple containing 2 integers!")
         self.set_position((
             round(self.get_x() + movement[0]), 
             round(self.get_y() + movement[1])
         ))
-        self.update_component()
+        if update_component:
+            self.update_component()
     
-    def update_size(self, newsize):
+    def update_size(self, newsize, update_component = True):
+        if not (isinstance(newsize, tuple) and len(newsize) == 2 and all(isinstance(d, int) and d > 0 for d in newsize)):
+            raise TypeError("Size must be a tuple containing 2 integers greater than 0!")
         self.set_size(newsize)
-        self.update_component()
+        if update_component:
+            self.update_component()
     
-    def update_color(self, color):
+    def update_color(self, color, update_component = True):
+        if not (isinstance(color, tuple) and len(color) == 3 and all(isinstance(c, int) and 0 <= c <= 255 for c in color)):
+            raise TypeError("Color must be a tuple with 3 integers between 0 and 255!")
         self.set_color(color)
-        self.update_component()
+        if update_component:
+            self.update_component()

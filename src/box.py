@@ -113,17 +113,22 @@ class Box(GameInterfaceComponent):
         self.set_surface()
         super().update_component()
     
-    #THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
-    def move(self, movement=(0,0)):
+    # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
+    # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
+    # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
+    def move(self, movement=(0,0), update_component = True):
         if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
             raise TypeError("Movement must be a tuple containing 2 integers!")
         for child in self.__children:
-            child.move(movement)
-        super().move(movement)
+            child.move(movement, False)
+        super().move(movement, update_component)
 
-    def update_alpha(self, alpha):
+    def update_alpha(self, alpha, update_component = True):
+        if not (isinstance(alpha, int) and alpha >= 0 and alpha <= 255):
+            raise TypeError("Alpha must be an integer of at least 0 and at most 255!")
         self.set_alpha(alpha)
-        self.update_component()
+        if update_component:
+            self.update_component()
 
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
