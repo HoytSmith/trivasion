@@ -14,7 +14,7 @@ class GameInterfaceComponent():
         self.hide()
         self.update_component()
     
-    #VALIDATION METHODS:
+    #VALIDATION METHOD:
     @staticmethod
     def validate_component(component):
         if not isinstance(component, GameInterfaceComponent):

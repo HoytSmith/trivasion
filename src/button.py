@@ -4,6 +4,7 @@ from src.alignment import Alignment
 from src.buttonstate import ButtonState
 from src.label import Label
 from src.box import Box
+from src.validate import Validate
 
 class Button(GameInterfaceComponent):
     def __init__(self, name="Button", priority=0, position=(0,0), size=(10,10), callback=None, label=None, styles=None):
@@ -14,24 +15,34 @@ class Button(GameInterfaceComponent):
         self.set_styles(styles)
         super().__init__(name=name, priority=priority, position=position, size=size)
 
+    #VALIDATION METHOD
+    @staticmethod
+    def validate_button(button):
+        if not isinstance(button, Button):
+            raise TypeError("Button must be of class Button or a subclass!")
+    
+    #SETTERS, GETTERS AND OTHER CLASS METHODS:
+    #CALLBACK METHODS:
     def set_callback(self, callback):
+        if callback:
+            Validate.callback(callback)
         self.__callback = callback
     
     def get_callback(self):
         return self.__callback
     
+    #LABEL METHODS:
     def set_label(self, label):
         if label:
-            if not isinstance(label, Label):
-                raise TypeError("Button label must be object of Label class!")
+            Label.validate_label(label)
         self.__label = label
     
     def get_label(self):
         return self.__label
     
+    #BUTTONSTATE METHODS:
     def set_state(self, state):
-        if not isinstance(state, ButtonState):
-            raise TypeError("Button State must be a valid ButtonState!")
+        Validate.button_state(state)
         self.__state = state
     
     def get_state(self):
@@ -39,40 +50,9 @@ class Button(GameInterfaceComponent):
     
     def is_state(self, state):
         return self.__state == state
-
-    def reset_styles(self):
-        self.__styles = {
-            ButtonState.IDLE : None,
-            ButtonState.HOVER : None,
-            ButtonState.ACTIVE : None
-        }
-    
-    def set_style(self, key, style):
-        if not isinstance(style, Box):
-            raise TypeError("Button style must be object of Box class!")
-        if key not in self.__styles:
-            raise KeyError("Button style name not recognized.")
-        self.__styles[key] = style
-    
-    def set_styles(self, styles):
-        if (isinstance(styles, dict)):
-            for style in styles:
-                self.set_style(style, styles[style])
-    
-    def get_style(self, key):
-        if key not in self.__styles:
-            raise KeyError("Button style name not recognized.")
-        return self.__styles[key]
-    
-    def get_styles(self):
-        return self.__styles
-    
-    def get_current_style(self):
-        return self.get_style(self.get_state())
     
     def change_state(self, new_state):
-        if not isinstance(new_state, ButtonState):
-            raise TypeError("New Button State must be a valid ButtonState!")
+        Validate.button_state(new_state)
         if not self.is_state(new_state):
             self.set_state(new_state)
             for style_state, style in self.__styles.items():
@@ -84,6 +64,39 @@ class Button(GameInterfaceComponent):
                         style.deactivate()
                         style.hide()
     
+    #STYLE METHODS:
+    def validate_style(self, key):
+        if key not in self.__styles:
+            raise KeyError("Button style name not recognized.")
+    
+    def reset_styles(self):
+        self.__styles = {
+            ButtonState.IDLE : None,
+            ButtonState.HOVER : None,
+            ButtonState.ACTIVE : None
+        }
+    
+    def set_style(self, key, style):
+        Box.validate_box(style)
+        self.validate_style(key)
+        self.__styles[key] = style
+    
+    def set_styles(self, styles):
+        if (isinstance(styles, dict)):
+            for style in styles:
+                self.set_style(style, styles[style])
+    
+    def get_style(self, key):
+        self.validate_style(key)
+        return self.__styles[key]
+    
+    def get_styles(self):
+        return self.__styles
+    
+    def get_current_style(self):
+        return self.get_style(self.get_state())
+    
+    #GAMELOOP METHODS:
     def render(self, screen):
         style = self.get_current_style()
         label = self.get_label()
@@ -104,11 +117,13 @@ class Button(GameInterfaceComponent):
                 self.change_state(ButtonState.IDLE)
         return False
     
+    #EVENT METHODS:
     def on_click(self):
         if callable(self.get_callback()) and not self.is_state(ButtonState.ACTIVE):
             self.get_callback()()
         self.change_state(ButtonState.ACTIVE)
     
+    #MAIN UPDATE METHOD
     def update_component(self):
         self.__label.update_component()
         for state in self.__styles:
@@ -118,20 +133,30 @@ class Button(GameInterfaceComponent):
     # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
     # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
     # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
-    def move(self, movement=(0,0), update_component = True):
-        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
-            raise TypeError("Movement must be a tuple containing 2 integers!")
-        self.__label.move(movement)
+    def update_position(self, new_position, relative = False, update_component = True):
         for state in self.__styles:
-            self.__styles[state].move(movement, False)
-        super().move(movement, update_component)
+            self.__styles[state].update_position(new_position=new_position, relative=relative, update_component=False)
+        super().update_position(new_position=new_position, relative=relative, update_component=update_component)
+    
+    def move(self, movement=(0,0), update_component = True):
+        self.update_position(movement, relative=True, update_component=update_component)
     
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
     def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
-                     size=(0,0), padding=(4,2), text_color=(255, 255, 255), text_size=36, button_color=(0,0,1), callback=None):
+                     size=(1,1), padding=(4,2), text_color=(255, 255, 255), text_size=36, button_color=(0,0,1), callback=None):
         def calc_style_colors(color=(0,0,0), intensity=0):
             return tuple((1 if c > 0 else 0) * intensity for c in color)
+        # validate parameters
+        # only parameters that aren't directly passed without
+        # modification are validated to avoid redundant checks
+        Validate.name(name)
+        Validate.priority(priority)
+        Validate.alignment(h_align)
+        Validate.alignment(v_align)
+        Validate.size(size)
+        Validate.padding(padding)
+        Validate.color(button_color)
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
