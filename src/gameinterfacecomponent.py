@@ -99,15 +99,6 @@ class GameInterfaceComponent():
         if len(self.__position) != 2:
             raise IndexError("Position is not properly set!")
         return self.__position[1]
-    
-    def move(self, movement=(0,0)):
-        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
-            raise TypeError("Movement must be a tuple containing 2 integers!")
-        self.set_position((
-            round(self.get_x() + movement[0]), 
-            round(self.get_y() + movement[1])
-        ))
-        self.update_component()
 
     def set_size(self, size=(10,10)):
         if not (isinstance(size, tuple) and len(size) == 2 and all(isinstance(d, int) and d > 0 for d in size)):
@@ -126,10 +117,6 @@ class GameInterfaceComponent():
         if len(self.__size) != 2:
             raise IndexError("Size is not properly set!")
         return self.__size[1]
-    
-    def update_size(self, newsize):
-        self.set_size(newsize)
-        self.update_component()
     
     def calculate_boundaries(self):
         if not (len(self.__position) == 2 and len(self.__size) == 2):
@@ -151,10 +138,6 @@ class GameInterfaceComponent():
     
     def get_color(self):
         return self.__color
-    
-    def update_color(self, color):
-        self.set_color(color)
-        self.update_component()
     
     def collides(self, component):
         if not isinstance(component, GameInterfaceComponent):
@@ -183,10 +166,28 @@ class GameInterfaceComponent():
     def handle_event(self, event, mouse_button_held):
         # Default Component doesn't handle events
         return False
-
-    def update_component(self):
-        self.calculate_boundaries()
-
+    
     def on_click(self):
         # Override in subclasses for specific behavior
         pass
+    
+    def update_component(self):
+        self.calculate_boundaries()
+
+    #THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
+    def move(self, movement=(0,0)):
+        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
+            raise TypeError("Movement must be a tuple containing 2 integers!")
+        self.set_position((
+            round(self.get_x() + movement[0]), 
+            round(self.get_y() + movement[1])
+        ))
+        self.update_component()
+    
+    def update_size(self, newsize):
+        self.set_size(newsize)
+        self.update_component()
+    
+    def update_color(self, color):
+        self.set_color(color)
+        self.update_component()

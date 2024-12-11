@@ -36,14 +36,6 @@ class Label(GameInterfaceComponent):
     
     def get_render(self):
         return self.__render
-    
-    def update_content(self, content):
-        self.set_content(content)
-        self.update_component()
-    
-    def update_size(self, size):
-        self.set_font_size(size)
-        self.update_component()
 
     def render(self, screen):
         #Render cached text surface
@@ -57,3 +49,12 @@ class Label(GameInterfaceComponent):
         self.set_font()
         self.set_render()
         super().update_component()
+    
+    #THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
+    def update_content(self, content):
+        self.set_content(content)
+        self.update_component()
+    
+    def update_size(self, size):
+        self.set_font_size(size)
+        self.update_component()

@@ -13,14 +13,6 @@ class Button(GameInterfaceComponent):
         self.set_label(label)
         self.set_styles(styles)
         super().__init__(name=name, priority=priority, position=position, size=size)
-    
-    def move(self, movement=(0,0)):
-        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
-            raise TypeError("Movement must be a tuple containing 2 integers!")
-        self.__label.move(movement)
-        for style in self.__styles:
-            style.move(movement)
-        super().move(movement)
 
     def set_callback(self, callback):
         self.__callback = callback
@@ -117,6 +109,16 @@ class Button(GameInterfaceComponent):
             self.get_callback()()
         self.change_state(ButtonState.ACTIVE)
     
+    #THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
+    def move(self, movement=(0,0)):
+        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
+            raise TypeError("Movement must be a tuple containing 2 integers!")
+        self.__label.move(movement)
+        for style in self.__styles:
+            style.move(movement)
+        super().move(movement)
+    
+    #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
     def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
                      size=(0,0), padding=(4,2), text_color=(255, 255, 255), text_size=36, button_color=(0,0,1), callback=None):

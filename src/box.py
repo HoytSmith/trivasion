@@ -31,13 +31,6 @@ class Box(GameInterfaceComponent):
         for child in self.__children:
             child.show()
     
-    def move(self, movement=(0,0)):
-        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
-            raise TypeError("Movement must be a tuple containing 2 integers!")
-        for child in self.__children:
-            child.move(movement)
-        super().move(movement)
-    
     def set_alpha(self, alpha):
         if not (isinstance(alpha, int) and alpha >= 0 and alpha <= 255):
             raise TypeError("Alpha must be an integer of at least 0 and at most 255!")
@@ -45,10 +38,6 @@ class Box(GameInterfaceComponent):
 
     def get_alpha(self):
         return self.__alpha
-    
-    def update_alpha(self, alpha):
-        self.set_alpha(alpha)
-        self.update_component()
 
     def reset_children(self):
         self.__children = []
@@ -123,7 +112,20 @@ class Box(GameInterfaceComponent):
     def update_component(self):
         self.set_surface()
         super().update_component()
+    
+    #THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
+    def move(self, movement=(0,0)):
+        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
+            raise TypeError("Movement must be a tuple containing 2 integers!")
+        for child in self.__children:
+            child.move(movement)
+        super().move(movement)
 
+    def update_alpha(self, alpha):
+        self.set_alpha(alpha)
+        self.update_component()
+
+    #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
     def create_text_box(name="Text_Box", priority=0, text="Text Box", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
                         size=(0,0), padding=(4,2), box_color=(128,128,128), text_color=(255, 255, 255), text_size=36):
