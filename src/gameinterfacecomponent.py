@@ -12,15 +12,63 @@ class GameInterfaceComponent():
         self.hide()
         self.update_component()
     
-    def is_active(self):
-        return self.__active
+    #VALIDATION METHODS:
+    def validate_name(self, name):
+        if not isinstance(name, str):
+            raise TypeError("Name must be of type String!")
+        if name == "":
+            raise ValueError("Name can not be empty!")
     
+    def validate_priority(self, priority):
+        if not isinstance(priority, int):
+            raise TypeError("Priority must be an integer!")
+        if priority < 0:
+            raise ValueError("Priority must be at least 0!")
+    
+    def validate_position(self, position):
+        if not isinstance(position, tuple):
+            raise TypeError("Position must be a tuple!")
+        if len(position) != 2:
+            raise IndexError("Position must contain exactly 2 elements!")
+        if not all(isinstance(c, int) for c in position):
+            raise ValueError("Position must only contain integers!")
+    
+    def validate_size(self, size):
+        if not isinstance(size, tuple):
+            raise TypeError("Size must be a tuple!")
+        if len(size) != 2:
+            raise IndexError("Size must contain exactly 2 elements!")
+        if not all(isinstance(d, int) and d > 0 for d in size):
+            raise ValueError("Size must only contain integers greater than 0!")
+    
+    def validate_color(self, color):
+        if not isinstance(color, tuple):
+            raise TypeError("Color must be a tuple!")
+        if len(color) != 3:
+            raise IndexError("Color must contain exactly 3 elements!")
+        if not all(isinstance(c, int) and 0 <= c <= 255 for c in color):
+            raise ValueError("Color must only contain integers greater than 0!")
+    
+    def validate_component(self, component):
+        if not isinstance(component, GameInterfaceComponent):
+            raise TypeError("Component must be of class GameInterfaceComponent or a subclass!")
+    
+    def validate_alignment(self, alignment):
+        if not isinstance(alignment, Alignment):
+            raise TypeError("Invalid Alignment!")
+
+    #SETTERS, GETTERS AND OTHER CLASS METHODS:
+    #ACTIVITY METHODS:
     def deactivate(self):
         self.__active = False
     
     def activate(self):
         self.__active = True
 
+    def is_active(self):
+        return self.__active
+
+    #VISIBILITY METHODS:
     def hide(self):
         self.__visible = False
     
@@ -30,30 +78,29 @@ class GameInterfaceComponent():
     def is_visible(self):
         return self.__visible
     
-    def is_named(self, name):
-        if not isinstance(name, str):
-            raise TypeError("Name must be of type String!")
-        return self.__name == name
-    
+    #NAME METHODS:
     def get_name(self):
         return self.__name
     
     def set_name(self, name):
-        if not isinstance(name, str):
-            raise TypeError("Name must be of type String!")
+        self.validate_name(name)
         self.__name = name
     
+    def is_named(self, name):
+        self.validate_name(name)
+        return self.__name == name
+    
+    #PRIORITY METHODS:
     def set_priority(self, priority):
-        if not (isinstance(priority, int) and priority >= 0):
-            raise TypeError("Priority must be an integer of at least 0!")
+        self.validate_priority(priority)
         self.__priority = priority
     
     def get_priority(self):
         return self.__priority
     
+    #POSITION METHODS:
     def set_position(self, position=(0,0)):
-        if not (isinstance(position, tuple) and len(position) == 2 and all(isinstance(c, int) for c in position)):
-            raise TypeError("Position must be a tuple containing 2 integers!")
+        self.validate_position(position)
         self.__position = position
     
     def get_position(self):
@@ -63,10 +110,10 @@ class GameInterfaceComponent():
     #given position coordinates are treated as percentages if percent_flag = True
     def position_component_relative(self, component, position = (0,0), percent_flag = False, h_align=Alignment.START, v_align=Alignment.START):
         #check validity of parameters
-        if not isinstance(component, GameInterfaceComponent):
-            raise TypeError("Component being positioned relatively must be of class GameInterfaceComponent or a subclass!")
-        if not (isinstance(h_align, Alignment) and isinstance(v_align, Alignment)):
-            raise TypeError("Alignments must be of class Alignment!")
+        self.validate_component(component)
+        self.validate_position(position)
+        self.validate_alignment(h_align)
+        self.validate_alignment(v_align)
         #setup relevant variables
         pos_x, pos_y = position
         new_x, new_y = self.get_position()
@@ -91,57 +138,60 @@ class GameInterfaceComponent():
         component.set_position((new_x, new_y))
 
     def get_x(self):
-        if len(self.__position) != 2:
-            raise IndexError("Position is not properly set!")
-        return self.__position[0]
+        position = self.get_position()
+        self.validate_position(position)
+        return position[0]
     
     def get_y(self):
-        if len(self.__position) != 2:
-            raise IndexError("Position is not properly set!")
-        return self.__position[1]
-
+        position = self.get_position()
+        self.validate_position(position)
+        return position[1]
+    
+    #SIZE METHODS:
     def set_size(self, size=(10,10)):
-        if not (isinstance(size, tuple) and len(size) == 2 and all(isinstance(d, int) and d > 0 for d in size)):
-            raise TypeError("Size must be a tuple containing 2 integers greater than 0!")
+        self.validate_size(size)
         self.__size = size
     
     def get_size(self):
         return self.__size
     
     def get_width(self):
-        if len(self.__size) != 2:
-            raise IndexError("Size is not properly set!")
-        return self.__size[0]
+        size = self.get_size()
+        self.validate_size(size)
+        return size[0]
     
     def get_height(self):
-        if len(self.__size) != 2:
-            raise IndexError("Size is not properly set!")
-        return self.__size[1]
+        size = self.get_size()
+        self.validate_size(size)
+        return size[1]
     
     def calculate_boundaries(self):
-        if not (len(self.__position) == 2 and len(self.__size) == 2):
-            raise ValueError("Position and Size must be properly set before boundaries can be calculated!")
+        position = self.get_position()
+        self.validate_position(position)
+        size = self.get_size()
+        self.validate_size(size)
+        
         self.__boundaries = {
-            "top" : self.get_y(),
-            "left" : self.get_x(),
-            "right" : self.get_x()+self.get_width(),
-            "bottom" : self.get_y()+self.get_height()
+            "top" : position[1],
+            "left" : position[0],
+            "right" : position[0] + size[0],
+            "bottom" : position[1] + size[1]
         }
 
     def get_boundaries(self):
         return self.__boundaries
-
+    
+    #COLOR METHODS:
     def set_color(self, color=(255, 255, 255)):
-        if not (isinstance(color, tuple) and len(color) == 3 and all(isinstance(c, int) and 0 <= c <= 255 for c in color)):
-            raise TypeError("Color must be a tuple with 3 integers between 0 and 255!")
+        self.validate_color(color)
         self.__color = color
     
     def get_color(self):
         return self.__color
     
+    #VARIOUS LOGIC METHODS:
     def collides(self, component):
-        if not isinstance(component, GameInterfaceComponent):
-            raise TypeError("Component must be object of GameInterfaceComponent class or subclass!")
+        self.validate_component(component)
         
         # Get boundaries for self
         self_boundaries = self.get_boundaries()
@@ -159,6 +209,7 @@ class GameInterfaceComponent():
         mouse_x, mouse_y = mouse_pos
         return (self.get_x() <= mouse_x <= self.get_x() + self.get_width() and self.get_y() <= mouse_y <= self.get_y() + self.get_height())
 
+    #GAMELOOP METHODS:
     def render(self, screen):
         #Default component is a rectangle
         pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
@@ -167,36 +218,42 @@ class GameInterfaceComponent():
         # Default Component doesn't handle events
         return False
     
+    #EVENT METHODS:
     def on_click(self):
         # Override in subclasses for specific behavior
         pass
     
+    #MAIN UPDATE METHOD
     def update_component(self):
         self.calculate_boundaries()
 
     # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
     # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
     # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
-    def move(self, movement=(0,0), update_component = True):
-        if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
-            raise TypeError("Movement must be a tuple containing 2 integers!")
-        self.set_position((
-            round(self.get_x() + movement[0]), 
-            round(self.get_y() + movement[1])
-        ))
+    def update_position(self, new_position, relative = False, update_component = True):
+        self.validate_position(new_position)
+        if relative:
+            current_position = self.get_position()
+            self.validate_position(current_position)
+            new_position = (
+                current_position[0] + new_position[0],
+                current_position[1] + new_position[1]
+            )
+        self.set_position(new_position)
         if update_component:
             self.update_component()
     
+    def move(self, movement=(0,0), update_component = True):
+        self.update_position(movement, relative=True, update_component=update_component)
+    
     def update_size(self, newsize, update_component = True):
-        if not (isinstance(newsize, tuple) and len(newsize) == 2 and all(isinstance(d, int) and d > 0 for d in newsize)):
-            raise TypeError("Size must be a tuple containing 2 integers greater than 0!")
+        self.validate_size(newsize)
         self.set_size(newsize)
         if update_component:
             self.update_component()
     
     def update_color(self, color, update_component = True):
-        if not (isinstance(color, tuple) and len(color) == 3 and all(isinstance(c, int) and 0 <= c <= 255 for c in color)):
-            raise TypeError("Color must be a tuple with 3 integers between 0 and 255!")
+        self.validate_color(color)
         self.set_color(color)
         if update_component:
             self.update_component()
