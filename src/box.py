@@ -125,10 +125,14 @@ class Box(GameInterfaceComponent):
             child.move(movement, False)
         super().move(movement, update_component)
 
-    def update_alpha(self, alpha, update_component = True):
+    def update_alpha(self, alpha, propogate_children = False, update_component = True):
         if not (isinstance(alpha, int) and alpha >= 0 and alpha <= 255):
             raise TypeError("Alpha must be an integer of at least 0 and at most 255!")
         self.set_alpha(alpha)
+        if propogate_children:
+            for child in self.__children:
+                if (hasattr(child, "update_alpha") and callable(getattr(child, "update_alpha"))):
+                    child.update_alpha(alpha, update_component=False)
         if update_component:
             self.update_component()
 
