@@ -2,12 +2,13 @@ import pygame
 from src.alignment import Alignment
 
 class GameInterfaceComponent():
-    def __init__(self, name="Component", priority=0, position=(0,0), size=(10,10), color=(255,255,255)):
+    def __init__(self, name="Component", priority=0, position=(0,0), size=(10,10), color=(255,255,255), alpha=255):
         self.set_name(name)
         self.set_priority(priority)
         self.set_position(position)
         self.set_size(size)
         self.set_color(color)
+        self.set_alpha(alpha)
         self.deactivate()
         self.hide()
         self.update_component()
@@ -48,6 +49,12 @@ class GameInterfaceComponent():
             raise IndexError("Color must contain exactly 3 elements!")
         if not all(isinstance(c, int) and 0 <= c <= 255 for c in color):
             raise ValueError("Color must only contain integers greater than 0!")
+    
+    def validate_alpha(self, alpha):
+        if not isinstance(alpha, int):
+            raise TypeError("Alpha must be an integer!")
+        if alpha < 0 or alpha > 255:
+            raise ValueError("Alpha value must be at least 0 and at most 255!")
     
     def validate_component(self, component):
         if not isinstance(component, GameInterfaceComponent):
@@ -176,6 +183,22 @@ class GameInterfaceComponent():
     def get_color(self):
         return self.__color
     
+    #ALPHA METHODS:
+    def set_alpha(self, alpha):
+        self.validate_alpha(alpha)
+        self.__alpha = alpha
+
+    def get_alpha(self):
+        return self.__alpha
+    
+    #RENDER SURFACE METHODS:
+    def set_surface(self):
+        self.__surface = pygame.Surface(self.get_size(), pygame.SRCALPHA)
+        self.__surface.fill((*self.get_color(), self.get_alpha()))
+    
+    def get_surface(self):
+        return self.__surface
+    
     #VARIOUS LOGIC METHODS:
     def collides(self, component):
         self.validate_component(component)
@@ -198,8 +221,7 @@ class GameInterfaceComponent():
 
     #GAMELOOP METHODS:
     def render(self, screen):
-        #Default component is a rectangle
-        pygame.draw.rect(screen, self.get_color(), (self.get_x(), self.get_y(), self.get_width(), self.get_height()))
+        screen.blit(self.get_surface(), self.get_position())
     
     def handle_event(self, event, mouse_button_held):
         # Default Component doesn't handle events
@@ -213,6 +235,7 @@ class GameInterfaceComponent():
     #MAIN UPDATE METHOD
     def update_component(self):
         self.calculate_boundaries()
+        self.set_surface()
 
     # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
     # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
@@ -241,5 +264,10 @@ class GameInterfaceComponent():
     
     def update_color(self, color, update_component = True):
         self.set_color(color)
+        if update_component:
+            self.update_component()
+    
+    def update_alpha(self, alpha, update_component = True):
+        self.set_alpha(alpha)
         if update_component:
             self.update_component()
