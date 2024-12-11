@@ -1,9 +1,5 @@
 from src.gamestates import GameState
-from src.gameinterfacecomponent import GameInterfaceComponent
 from src.alignment import Alignment
-from src.box import Box
-from src.label import Label
-from src.button import Button
 from src.buttonstate import ButtonState
 
 class Validate():
@@ -70,24 +66,18 @@ class Validate():
             raise ValueError(f"Alpha value must be at least {Validate.alpha_minimum} and at most {Validate.alpha_maximum}!")
     
     @staticmethod
-    def component(component):
-        if not isinstance(component, GameInterfaceComponent):
-            raise TypeError("Component must be of class GameInterfaceComponent or a subclass!")
+    def text_content(text_content):
+        if not isinstance(text_content, str):
+            raise TypeError("Text content must be of type string!")
+        if text_content == "":
+            raise ValueError("Text content can not be empty!")
     
     @staticmethod
-    def box(box):
-        if not isinstance(box, Box):
-            raise TypeError("Box must be of class Box or a subclass!")
-    
-    @staticmethod
-    def label(label):
-        if not isinstance(label, Label):
-            raise TypeError("Label must be of class Label or a subclass!")
-    
-    @staticmethod
-    def button(button):
-        if not isinstance(button, Button):
-            raise TypeError("Button must be of class Button or a subclass!")
+    def font_size(font_size):
+        if not isinstance(font_size, int):
+            raise TypeError("Font size must be of type integer!")
+        if font_size < Validate.font_size_minimum or font_size > Validate.font_size_maximum:
+            raise ValueError(f"Font size must be greater than {Validate.font_size_minimum} and at most {Validate.font_size_maximum}!")
     
     @staticmethod
     def game_state(state):
@@ -103,17 +93,3 @@ class Validate():
     def button_state(state):
         if not isinstance(state, GameState):
             raise TypeError("Invalid ButtonState!")
-    
-    @staticmethod
-    def text_content(text_content):
-        if not isinstance(text_content, str):
-            raise TypeError("Text content must be of type string!")
-        if text_content == "":
-            raise ValueError("Text content can not be empty!")
-    
-    @staticmethod
-    def font_size(font_size):
-        if not isinstance(font_size, int):
-            raise TypeError("Font size must be of type integer!")
-        if font_size < Validate.font_size_minimum or font_size > Validate.font_size_maximum:
-            raise ValueError(f"Font size must be greater than {Validate.font_size_minimum} and at most {Validate.font_size_maximum}!")
