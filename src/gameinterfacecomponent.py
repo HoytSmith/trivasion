@@ -138,14 +138,10 @@ class GameInterfaceComponent():
         component.set_position((new_x, new_y))
 
     def get_x(self):
-        position = self.get_position()
-        self.validate_position(position)
-        return position[0]
+        return self.__position[0]
     
     def get_y(self):
-        position = self.get_position()
-        self.validate_position(position)
-        return position[1]
+        return self.__position[1]
     
     #SIZE METHODS:
     def set_size(self, size=(10,10)):
@@ -156,26 +152,17 @@ class GameInterfaceComponent():
         return self.__size
     
     def get_width(self):
-        size = self.get_size()
-        self.validate_size(size)
-        return size[0]
+        return self.__size[0]
     
     def get_height(self):
-        size = self.get_size()
-        self.validate_size(size)
-        return size[1]
+        return self.__size[1]
     
     def calculate_boundaries(self):
-        position = self.get_position()
-        self.validate_position(position)
-        size = self.get_size()
-        self.validate_size(size)
-        
         self.__boundaries = {
-            "top" : position[1],
-            "left" : position[0],
-            "right" : position[0] + size[0],
-            "bottom" : position[1] + size[1]
+            "top" : self.get_y(),
+            "left" : self.get_x(),
+            "right" : self.get_x() + self.get_width(),
+            "bottom" : self.get_y() + self.get_height()
         }
 
     def get_boundaries(self):
@@ -231,8 +218,9 @@ class GameInterfaceComponent():
     # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
     # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
     def update_position(self, new_position, relative = False, update_component = True):
-        self.validate_position(new_position)
         if relative:
+            #Validation necessary to ensure calculations can be made
+            self.validate_position(new_position)
             current_position = self.get_position()
             self.validate_position(current_position)
             new_position = (
@@ -247,13 +235,11 @@ class GameInterfaceComponent():
         self.update_position(movement, relative=True, update_component=update_component)
     
     def update_size(self, newsize, update_component = True):
-        self.validate_size(newsize)
         self.set_size(newsize)
         if update_component:
             self.update_component()
     
     def update_color(self, color, update_component = True):
-        self.validate_color(color)
         self.set_color(color)
         if update_component:
             self.update_component()
