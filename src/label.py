@@ -1,5 +1,6 @@
 import pygame
 from src.gameinterfacecomponent import GameInterfaceComponent
+from src.validate import Validate
 
 class Label(GameInterfaceComponent):
     def __init__(self, name="Label", priority=0, content="Text here...", position=(0,0), color=(255, 255, 255), alpha=255, font_size=24):
@@ -7,23 +8,16 @@ class Label(GameInterfaceComponent):
         self.set_font_size(font_size)
         super().__init__(name=name, priority=priority, position=position, color=color, alpha=alpha)
     
-    #VALIDATION METHODS:
-    def validate_content(self, content):
-        if not isinstance(content, str):
-            raise TypeError("Label text content must be of type string!")
-        if content == "":
-            raise ValueError("Label text content can not be empty!")
-    
-    def validate_font_size(self, font_size):
-        if not isinstance(font_size, int):
-            raise TypeError("Label font size must be of type integer!")
-        if font_size < 8 or font_size > 100:
-            raise ValueError("Label font size must be greater than 7 and at most 100!")
+    #VALIDATION METHOD:
+    @staticmethod
+    def validate_label(label):
+        if not isinstance(label, Label):
+            raise TypeError("Label must be of class Label or a subclass!")
     
     #SETTERS, GETTERS AND OTHER CLASS METHODS:
     #CONTENT METHODS:
     def set_content(self, content):
-        self.validate_content(content)
+        Validate.text_content(content)
         self.__content = content
     
     def get_content(self):
@@ -31,7 +25,7 @@ class Label(GameInterfaceComponent):
     
     #FONT SIZE METHODS:
     def set_font_size(self, font_size=24):
-        self.validate_font_size(font_size)
+        Validate.font_size(font_size)
         self.__font_size = font_size
     
     def get_font_size(self):
