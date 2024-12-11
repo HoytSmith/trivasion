@@ -1,4 +1,3 @@
-import pygame
 from src.gameinterfacecomponent import GameInterfaceComponent
 from src.alignment import Alignment
 from src.label import Label
@@ -9,6 +8,12 @@ class Box(GameInterfaceComponent):
         if children:
             self.add_children(children)
         super().__init__(name=name, priority=priority, position=position, size=size, color=color, alpha=alpha)
+    
+    #VALIDATION METHOD:
+    @staticmethod
+    def validate_box(box):
+        if not isinstance(box, Box):
+            raise TypeError("Box must be of class Box or a subclass!")
     
     #SETTERS, GETTERS AND OTHER CLASS METHODS:
     #ACTIVITY METHODS:
@@ -38,7 +43,7 @@ class Box(GameInterfaceComponent):
         self.__children = []
 
     def add_child(self, child, sort=True):
-        self.validate_component(child)
+        GameInterfaceComponent.validate_component(child)
         self.__children.append(child)
         if sort:
             self.sort_children()
@@ -50,7 +55,7 @@ class Box(GameInterfaceComponent):
         self.sort_children()
     
     def remove_child(self, child, sort=True):
-        self.validate_component(child)
+        GameInterfaceComponent.validate_component(child)
         if child in self.__children:
             self.__children.remove(child)
         if sort:
