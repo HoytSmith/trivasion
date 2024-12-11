@@ -1,5 +1,6 @@
 import pygame
 from src.alignment import Alignment
+from src.validate import Validate
 
 class GameInterfaceComponent():
     def __init__(self, name="Component", priority=0, position=(0,0), size=(10,10), color=(255,255,255), alpha=255):
@@ -14,55 +15,10 @@ class GameInterfaceComponent():
         self.update_component()
     
     #VALIDATION METHODS:
-    def validate_name(self, name):
-        if not isinstance(name, str):
-            raise TypeError("Name must be of type String!")
-        if name == "":
-            raise ValueError("Name can not be empty!")
-    
-    def validate_priority(self, priority):
-        if not isinstance(priority, int):
-            raise TypeError("Priority must be an integer!")
-        if priority < 0:
-            raise ValueError("Priority must be at least 0!")
-    
-    def validate_position(self, position):
-        if not isinstance(position, tuple):
-            raise TypeError("Position must be a tuple!")
-        if len(position) != 2:
-            raise IndexError("Position must contain exactly 2 elements!")
-        if not all(isinstance(c, int) for c in position):
-            raise ValueError("Position must only contain integers!")
-    
-    def validate_size(self, size):
-        if not isinstance(size, tuple):
-            raise TypeError("Size must be a tuple!")
-        if len(size) != 2:
-            raise IndexError("Size must contain exactly 2 elements!")
-        if not all(isinstance(d, int) and d > 0 for d in size):
-            raise ValueError("Size must only contain integers greater than 0!")
-    
-    def validate_color(self, color):
-        if not isinstance(color, tuple):
-            raise TypeError("Color must be a tuple!")
-        if len(color) != 3:
-            raise IndexError("Color must contain exactly 3 elements!")
-        if not all(isinstance(c, int) and 0 <= c <= 255 for c in color):
-            raise ValueError("Color must only contain integers greater than 0!")
-    
-    def validate_alpha(self, alpha):
-        if not isinstance(alpha, int):
-            raise TypeError("Alpha must be an integer!")
-        if alpha < 0 or alpha > 255:
-            raise ValueError("Alpha value must be at least 0 and at most 255!")
-    
-    def validate_component(self, component):
+    @staticmethod
+    def validate_component(component):
         if not isinstance(component, GameInterfaceComponent):
             raise TypeError("Component must be of class GameInterfaceComponent or a subclass!")
-    
-    def validate_alignment(self, alignment):
-        if not isinstance(alignment, Alignment):
-            raise TypeError("Invalid Alignment!")
 
     #SETTERS, GETTERS AND OTHER CLASS METHODS:
     #ACTIVITY METHODS:
@@ -90,16 +46,16 @@ class GameInterfaceComponent():
         return self.__name
     
     def set_name(self, name):
-        self.validate_name(name)
+        Validate.name(name)
         self.__name = name
     
     def is_named(self, name):
-        self.validate_name(name)
+        Validate.name(name)
         return self.__name == name
     
     #PRIORITY METHODS:
     def set_priority(self, priority):
-        self.validate_priority(priority)
+        Validate.priority(priority)
         self.__priority = priority
     
     def get_priority(self):
@@ -107,7 +63,7 @@ class GameInterfaceComponent():
     
     #POSITION METHODS:
     def set_position(self, position=(0,0)):
-        self.validate_position(position)
+        Validate.position(position)
         self.__position = position
     
     def get_position(self):
@@ -117,10 +73,10 @@ class GameInterfaceComponent():
     #given position coordinates are treated as percentages if percent_flag = True
     def position_component_relative(self, component, position = (0,0), percent_flag = False, h_align=Alignment.START, v_align=Alignment.START):
         #check validity of parameters
-        self.validate_component(component)
-        self.validate_position(position)
-        self.validate_alignment(h_align)
-        self.validate_alignment(v_align)
+        GameInterfaceComponent.validate_component(component)
+        Validate.position(position)
+        Validate.alignment(h_align)
+        Validate.alignment(v_align)
         #setup relevant variables
         pos_x, pos_y = position
         new_x, new_y = self.get_position()
@@ -152,7 +108,7 @@ class GameInterfaceComponent():
     
     #SIZE METHODS:
     def set_size(self, size=(10,10)):
-        self.validate_size(size)
+        Validate.size(size)
         self.__size = size
     
     def get_size(self):
@@ -177,15 +133,15 @@ class GameInterfaceComponent():
     
     #COLOR METHODS:
     def set_color(self, color=(255, 255, 255)):
-        self.validate_color(color)
+        Validate.color(color)
         self.__color = color
     
     def get_color(self):
         return self.__color
     
     #ALPHA METHODS:
-    def set_alpha(self, alpha):
-        self.validate_alpha(alpha)
+    def set_alpha(self, alpha=255):
+        Validate.alpha(alpha)
         self.__alpha = alpha
 
     def get_alpha(self):
@@ -201,7 +157,7 @@ class GameInterfaceComponent():
     
     #VARIOUS LOGIC METHODS:
     def collides(self, component):
-        self.validate_component(component)
+        GameInterfaceComponent.validate_component(component)
         
         # Get boundaries for self
         self_boundaries = self.get_boundaries()
@@ -243,9 +199,9 @@ class GameInterfaceComponent():
     def update_position(self, new_position, relative = False, update_component = True):
         if relative:
             #Validation necessary to ensure calculations can be made
-            self.validate_position(new_position)
+            Validate.position(new_position)
             current_position = self.get_position()
-            self.validate_position(current_position)
+            Validate.position(current_position)
             new_position = (
                 current_position[0] + new_position[0],
                 current_position[1] + new_position[1]
