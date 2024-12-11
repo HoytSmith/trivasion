@@ -1,6 +1,7 @@
 from src.gameinterfacecomponent import GameInterfaceComponent
 from src.alignment import Alignment
 from src.label import Label
+from src.validate import Validate
 
 class Box(GameInterfaceComponent):
     def __init__(self, name="Box", priority=0, position=(0,0), size=(10,10), color=(255, 255, 255), alpha=255, children=None):
@@ -131,7 +132,16 @@ class Box(GameInterfaceComponent):
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
     def create_text_box(name="Text_Box", priority=0, text="Text Box", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
-                        size=(0,0), padding=(4,2), box_color=(128,128,128), text_color=(255, 255, 255), text_size=36):
+                        size=(1,1), padding=(4,2), box_color=(128,128,128), text_color=(255, 255, 255), text_size=36):
+        # validate parameters
+        # only parameters that aren't directly passed without
+        # modification are validated to avoid redundant checks
+        Validate.name(name)
+        Validate.priority(priority)
+        Validate.alignment(h_align)
+        Validate.alignment(v_align)
+        Validate.size(size)
+        Validate.padding(padding)
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
