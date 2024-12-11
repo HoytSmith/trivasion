@@ -8,6 +8,8 @@ class Validate():
     position_length = 2
     size_length = 2
     size_minimum = 0
+    padding_length = 2
+    padding_minimum = 0
     color_length = 3
     color_minimum = 0
     color_maximum = 255
@@ -50,6 +52,15 @@ class Validate():
             raise ValueError(f"Size must only contain integers greater than {Validate.size_minimum}!")
     
     @staticmethod
+    def padding(padding):
+        if not isinstance(padding, tuple):
+            raise TypeError("Padding must be a tuple!")
+        if len(padding) != Validate.padding_length:
+            raise IndexError(f"Padding must contain exactly {Validate.padding_length} elements!")
+        if not all(isinstance(d, int) and d >= Validate.padding_minimum for d in padding):
+            raise ValueError(f"Padding must only contain integers greater than {Validate.padding_minimum}!")
+    
+    @staticmethod
     def color(color):
         if not isinstance(color, tuple):
             raise TypeError("Color must be a tuple!")
@@ -80,8 +91,13 @@ class Validate():
             raise ValueError(f"Font size must be greater than {Validate.font_size_minimum} and at most {Validate.font_size_maximum}!")
     
     @staticmethod
+    def callback(callback):
+        if not callable(callback):
+            raise TypeError("Callback must be a callable function!")
+    
+    @staticmethod
     def game_state(state):
-        if not isinstance(state, ButtonState):
+        if not isinstance(state, GameState):
             raise TypeError("Invalid GameState!")
 
     @staticmethod
@@ -91,5 +107,5 @@ class Validate():
     
     @staticmethod
     def button_state(state):
-        if not isinstance(state, GameState):
+        if not isinstance(state, ButtonState):
             raise TypeError("Invalid ButtonState!")
