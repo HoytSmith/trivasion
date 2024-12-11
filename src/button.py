@@ -109,6 +109,12 @@ class Button(GameInterfaceComponent):
             self.get_callback()()
         self.change_state(ButtonState.ACTIVE)
     
+    def update_component(self):
+        self.__label.update_component()
+        for state in self.__styles:
+            self.__styles[state].update_component()
+        super().update_component()
+
     # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
     # EACH OF THESE METHODS INCLUDES A FLAG 'UPDATE_COMPONENT' THAT CAN BE SET TO FALSE
     # TO REDUCE REDUNDANT UPDATE_COMPONENT CALLS FOR CHILD ELEMENTS
@@ -116,8 +122,8 @@ class Button(GameInterfaceComponent):
         if not (isinstance(movement, tuple) and len(movement) == 2 and all(isinstance(c, int) for c in movement)):
             raise TypeError("Movement must be a tuple containing 2 integers!")
         self.__label.move(movement)
-        for style in self.__styles:
-            style.move(movement, False)
+        for state in self.__styles:
+            self.__styles[state].move(movement, False)
         super().move(movement, update_component)
     
     #THE FOLLOWING ARE ANY STATIC METHODS

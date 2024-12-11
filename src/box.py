@@ -111,6 +111,8 @@ class Box(GameInterfaceComponent):
     
     def update_component(self):
         self.set_surface()
+        for child in self.__children:
+            child.update_component()
         super().update_component()
     
     # THE FOLLOWING ARE THE UPDATE METHODS - EACH CALLS UPDATE_COMPONENT AT THE END
