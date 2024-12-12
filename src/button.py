@@ -22,6 +22,40 @@ class Button(GameInterfaceComponent):
             raise TypeError("Button must be of class Button or a subclass!")
     
     #SETTERS, GETTERS AND OTHER CLASS METHODS:
+    #ACTIVITY METHODS:
+    def deactivate(self):
+        super().deactivate()
+        label = self.get_label()
+        if label:
+            label.deactivate()
+        for state in self.__styles:
+            self.__styles[state].deactivate()
+    
+    def activate(self):
+        super().activate()
+        label = self.get_label()
+        if label:
+            label.activate()
+        for state in self.__styles:
+            self.__styles[state].activate()
+    
+    #VISIBILITY METHODS:
+    def hide(self):
+        super().hide()
+        label = self.get_label()
+        if label:
+            label.hide()
+        for state in self.__styles:
+            self.__styles[state].hide()
+    
+    def show(self):
+        super().show()
+        label = self.get_label()
+        if label:
+            label.show()
+        for state in self.__styles:
+            self.__styles[state].show()
+    
     #CALLBACK METHODS:
     def set_callback(self, callback):
         if callback:
@@ -193,6 +227,7 @@ class Button(GameInterfaceComponent):
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
+        print(f"Label size for button {name} is {label_size}")
         #prepare sizing
         button_size = (
             max(size[0], label_size[0]+(padding[0]*2)),
