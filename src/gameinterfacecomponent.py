@@ -213,8 +213,8 @@ class GameInterfaceComponent():
     def move(self, movement=(0,0), update_component = True):
         self.update_position(movement, relative=True, update_component=update_component)
     
-    def update_size(self, newsize, update_component = True):
-        self.set_size(newsize)
+    def update_size(self, new_size, update_component = True):
+        self.set_size(new_size)
         if update_component:
             self.update_component()
     
