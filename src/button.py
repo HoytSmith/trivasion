@@ -40,6 +40,29 @@ class Button(GameInterfaceComponent):
     def get_label(self):
         return self.__label
     
+    def maintain_label_position(self, new_size):
+        def calc_new_label_position(label_position, label_size, button_position, button_size, new_button_size):
+            # Calculate label's new position to maintain alignment
+            label_offset_ratio = 0
+            if button_size != label_size:
+                label_offset_ratio = (label_position - button_position) / (button_size - label_size) if button_size - label_size != 0 else 0
+            return (button_position + round(label_offset_ratio * (new_button_size - label_size)))
+        label = self.get_label()
+        if label:
+            label_width, label_height = label.get_size()
+
+            # make sure the button doesn't become smaller than the label itself
+            new_button_width = max(new_size[0], label_width)
+            new_button_height = max(new_size[1], label_height)
+
+            new_label_x = calc_new_label_position(label.get_x(), label_width, self.get_x(), self.get_width(), new_button_width)
+            new_label_y = calc_new_label_position(label.get_y(), label_height, self.get_y(), self.get_height(), new_button_height)
+            
+            # apply everything
+            label.update_position((new_label_x, new_label_y), update_component=False)
+            new_size = (new_button_width, new_button_height)
+        return new_size
+    
     #BUTTONSTATE METHODS:
     def set_state(self, state):
         Validate.button_state(state)
@@ -141,10 +164,20 @@ class Button(GameInterfaceComponent):
     def move(self, movement=(0,0), update_component = True):
         self.update_position(movement, relative=True, update_component=update_component)
     
+    def update_size(self, new_size, update_component = True):
+        # if a label is present, we wish to preserve its positioning
+        # if the new_size is smaller than the label, it will be corrected
+        new_size = self.maintain_label_position(new_size)
+        
+        for state in self.__styles:
+            self.__styles[state].update_size(new_size=new_size, update_component=update_component)
+        super().update_size(new_size=new_size, update_component=update_component)
+    
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
     def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
                      size=(1,1), padding=(4,2), text_color=(255, 255, 255), text_size=36, button_color=(0,0,1), callback=None):
+        #helper function only useful for this specific method
         def calc_style_colors(color=(0,0,0), intensity=0):
             return tuple((1 if c > 0 else 0) * intensity for c in color)
         # validate parameters
