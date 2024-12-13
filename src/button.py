@@ -194,6 +194,23 @@ class Button(GameInterfaceComponent):
             self.__styles[state].update_size(new_size=new_size, update_component=update_component)
         super().update_size(new_size=new_size, update_component=update_component)
     
+    def update_label(self, new_text_content=None, new_text_size=None, update_component=True):
+        label = self.get_label()
+        if label and (new_text_content or new_text_size):
+            old_label_width, old_label_height = label.get_size()
+            if new_text_content:
+                label.update_content(new_text_content)
+            if new_text_size:
+                label.update_font_size(new_text_size)
+            new_label_width, new_label_height = label.get_size()
+            width_scale = new_label_width / old_label_width
+            height_scale = new_label_height / old_label_height
+            new_size = (
+                round(self.get_width() * width_scale),
+                round(self.get_height() * height_scale),
+            )
+            self.update_size(new_size, update_component=update_component)
+    
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
     def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
