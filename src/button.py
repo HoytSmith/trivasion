@@ -217,19 +217,17 @@ class Button(GameInterfaceComponent):
         # calculate new button size based on scaling
         width_scale = new_label_width / old_label_width
         height_scale = new_label_height / old_label_height
-        new_size = (
-            round(self_width * width_scale),
-            round(self_height * height_scale),
-        )
+        new_self_width = round(self_width * width_scale)
+        new_self_height = round(self_height * height_scale)
 
         # reposition label appropriately
         left_label_ratio = GameInterfaceComponent.calc_offset_ratio(self_left, self_width, old_label_left, old_label_width)
         top_label_ratio = GameInterfaceComponent.calc_offset_ratio(self_top, self_height, old_label_top, old_label_height)
-        new_label_left = GameInterfaceComponent.calc_new_position(self_left, old_label_width, new_label_width, left_label_ratio)
-        new_label_top = GameInterfaceComponent.calc_new_position(self_top, old_label_height, new_label_height, top_label_ratio)
+        new_label_left = GameInterfaceComponent.calc_new_position(self_left, new_label_width, new_self_width, left_label_ratio)
+        new_label_top = GameInterfaceComponent.calc_new_position(self_top, new_label_height, new_self_height, top_label_ratio)
         label.update_position((new_label_left, new_label_top), update_component=False)
 
-        self.update_size(new_size, update_component=update_component)
+        self.update_size((new_self_width, new_self_height), update_component=update_component)
     
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
