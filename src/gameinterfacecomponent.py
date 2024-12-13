@@ -69,8 +69,14 @@ class GameInterfaceComponent():
     def get_position(self):
         return self.__position
     
-    #positions the given component relative to this component
-    #given position coordinates are treated as percentages if percent_flag = True
+    def get_x(self):
+        return self.__position[0]
+    
+    def get_y(self):
+        return self.__position[1]
+
+    # positions the given component relative to this component
+    # given position coordinates are treated as percentages if percent_flag = True
     def position_component_relative(self, component, position = (0,0), percent_flag = False, h_align=Alignment.START, v_align=Alignment.START):
         #check validity of parameters
         GameInterfaceComponent.validate_component(component)
@@ -99,12 +105,58 @@ class GameInterfaceComponent():
         new_x += pos_x
         new_y += pos_y
         component.set_position((new_x, new_y))
-
-    def get_x(self):
-        return self.__position[0]
     
-    def get_y(self):
-        return self.__position[1]
+    # maintains the positioning of a component relative to self,
+    # when self is being scaled to the given new_size.
+    # if scale_component = True, then the component will resize appropriately.
+    # this method implicitly assumes that both values in new_size will not be 
+    # smaller than the component's size, unless scale_component = True.
+    def maintain_relative_position(self, component, new_size, scale_component = False, update_component = False):
+        #helper functions
+        # implicitly assumes that comp_size <= self_size
+        # implicitly assumes that comp_position >= self_position
+        def calc_offset_ratio(self_position, self_size, comp_position, comp_size):
+            if self_size == comp_size:
+                # assume a centered alignment if there is no offset on either side
+                return 0.5
+            elif self_position == comp_position:
+                # if given positions align, all the offset goes to the opposite side
+                return 0
+            else:
+                # there is some offset, calculate the ratio and return it
+                absolute_offset = comp_position - self_position
+                total_offset = self_size - comp_size
+                return absolute_offset / total_offset
+        # implicitly assumes that comp_size <= new_size
+        def calc_new_position(self_position, comp_size, new_size, offset_ratio):
+            return self_position + round(offset_ratio * (new_size - comp_size))
+        # implicitly assumes that comp_size <= self_size
+        def calc_scale(self_size, comp_size):
+            return comp_size / self_size
+        # validate parameters
+        GameInterfaceComponent.validate_component(component)
+        Validate.size(new_size)
+        # get the basic variables
+        self_left, self_top = self.get_position()
+        self_width, self_height = self.get_size()
+        comp_width, comp_height = component.get_size()
+        new_width, new_height = new_size
+        # calculate the offset ratios first
+        left_offset_ratio = calc_offset_ratio(self_left, self_width, component.get_x(), comp_width)
+        top_offset_ratio = calc_offset_ratio(self_top, self_height, component.get_y(), comp_height)
+        # if the component is being scaled, do that prior to updating the position
+        if scale_component:
+            width_scale = calc_scale(self_width, comp_width)
+            height_scale = calc_scale(self_height, comp_height)
+            comp_width = new_width * width_scale
+            comp_height = new_height * height_scale
+            component.update_size((comp_width, comp_height), update_component=False)
+        # calculate the new positions and update component position
+        new_position = (
+            calc_new_position(self_left, comp_width, new_width, left_offset_ratio),
+            calc_new_position(self_top, comp_height, new_height, top_offset_ratio)
+        )
+        component.update_position(new_position, update_component=update_component)
     
     #SIZE METHODS:
     def set_size(self, size=(10,10)):
