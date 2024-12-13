@@ -112,27 +112,6 @@ class GameInterfaceComponent():
     # this method implicitly assumes that both values in new_size will not be 
     # smaller than the component's size, unless scale_component = True.
     def maintain_relative_position(self, component, new_size, scale_component = False, update_component = False):
-        #helper functions
-        # implicitly assumes that comp_size <= self_size
-        # implicitly assumes that comp_position >= self_position
-        def calc_offset_ratio(self_position, self_size, comp_position, comp_size):
-            if self_size == comp_size:
-                # assume a centered alignment if there is no offset on either side
-                return 0.5
-            elif self_position == comp_position:
-                # if given positions align, all the offset goes to the opposite side
-                return 0
-            else:
-                # there is some offset, calculate the ratio and return it
-                absolute_offset = comp_position - self_position
-                total_offset = self_size - comp_size
-                return absolute_offset / total_offset
-        # implicitly assumes that comp_size <= new_size
-        def calc_new_position(self_position, comp_size, new_size, offset_ratio):
-            return self_position + round(offset_ratio * (new_size - comp_size))
-        # implicitly assumes that comp_size <= self_size
-        def calc_scale(self_size, comp_size):
-            return comp_size / self_size
         # validate parameters
         GameInterfaceComponent.validate_component(component)
         Validate.size(new_size)
@@ -142,19 +121,19 @@ class GameInterfaceComponent():
         comp_width, comp_height = component.get_size()
         new_width, new_height = new_size
         # calculate the offset ratios first
-        left_offset_ratio = calc_offset_ratio(self_left, self_width, component.get_x(), comp_width)
-        top_offset_ratio = calc_offset_ratio(self_top, self_height, component.get_y(), comp_height)
+        left_offset_ratio = GameInterfaceComponent.calc_offset_ratio(self_left, self_width, component.get_x(), comp_width)
+        top_offset_ratio = GameInterfaceComponent.calc_offset_ratio(self_top, self_height, component.get_y(), comp_height)
         # if the component is being scaled, do that prior to updating the position
         if scale_component:
-            width_scale = calc_scale(self_width, comp_width)
-            height_scale = calc_scale(self_height, comp_height)
+            width_scale = comp_width / self_width
+            height_scale = comp_height / self_height
             comp_width = new_width * width_scale
             comp_height = new_height * height_scale
             component.update_size((comp_width, comp_height), update_component=False)
         # calculate the new positions and update component position
         new_position = (
-            calc_new_position(self_left, comp_width, new_width, left_offset_ratio),
-            calc_new_position(self_top, comp_height, new_height, top_offset_ratio)
+            GameInterfaceComponent.calc_new_position(self_left, comp_width, new_width, left_offset_ratio),
+            GameInterfaceComponent.calc_new_position(self_top, comp_height, new_height, top_offset_ratio)
         )
         component.update_position(new_position, update_component=update_component)
     
@@ -279,3 +258,31 @@ class GameInterfaceComponent():
         self.set_alpha(alpha)
         if update_component:
             self.update_component()
+
+    #THE FOLLOWING ARE ANY STATIC METHODS:
+
+    # calc_offset_ratio calculates the offset ratio of the left or top position
+    # between a parent component and its child component
+    # implicitly assumes that child_size <= parent_size
+    # implicitly assumes that child_position >= parent_position
+    @staticmethod
+    def calc_offset_ratio(parent_position, parent_size, child_position, child_size):
+        if parent_size == child_size:
+            # assume a centered alignment if there is no offset on either side
+            return 0.5
+        elif parent_position == child_position:
+            # if given positions align, all the offset goes to the opposite side
+            return 0
+        else:
+            # there is some offset, calculate the ratio and return it
+            absolute_offset = child_position - parent_position
+            total_offset = parent_size - child_size
+            return absolute_offset / total_offset
+
+    # calc_new_child_position calculates the new position that a child component
+    # should have relative to its parent based on the given offset_ratio when
+    # a resizing is done with the given new_size value.
+    # implicitly assumes that comp_size <= new_size
+    @staticmethod
+    def calc_new_position(parent_position, child_size, new_size, offset_ratio):
+        return parent_position + round(offset_ratio * (new_size - child_size))
