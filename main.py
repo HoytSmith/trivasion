@@ -31,7 +31,6 @@ pause_keys = [pygame.K_p, pygame.K_ESCAPE]
 
 #initializes the game. resets everything when called again later
 def init_game():
-    global game_is_running, game_settings, current_state, interfaces
     init_pygame()
     init_interfaces()
     change_state(GameState.MENU)

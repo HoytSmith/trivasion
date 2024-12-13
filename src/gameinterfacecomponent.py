@@ -281,8 +281,8 @@ class GameInterfaceComponent():
 
     # calc_new_child_position calculates the new position that a child component
     # should have relative to its parent based on the given offset_ratio when
-    # a resizing is done with the given new_size value.
-    # implicitly assumes that comp_size <= new_size
+    # a resizing is done on the parent with the given new_size value.
+    # implicitly assumes that child_size <= new_size
     @staticmethod
     def calc_new_position(parent_position, child_size, new_size, offset_ratio):
         return parent_position + round(offset_ratio * (new_size - child_size))

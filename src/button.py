@@ -194,41 +194,6 @@ class Button(GameInterfaceComponent):
             self.__styles[state].update_size(new_size=new_size, update_component=update_component)
         super().update_size(new_size=new_size, update_component=update_component)
     
-    def update_label(self, new_text_content=None, new_text_size=None, update_component=True):
-        label = self.get_label()
-        if not (label and (new_text_content or new_text_size)):
-            return
-        
-        self_left, self_top = self.get_position()
-        self_width, self_height = self.get_size()
-        old_label_left, old_label_top = label.get_position()
-        old_label_width, old_label_height = label.get_size()
-
-        if new_text_content:
-            label.update_content(new_text_content)
-        if new_text_size:
-            label.update_font_size(new_text_size)
-        
-        new_label_width, new_label_height = label.get_size()
-
-        if old_label_width == new_label_width and old_label_height == new_label_height:
-            return
-        
-        # calculate new button size based on scaling
-        width_scale = new_label_width / old_label_width
-        height_scale = new_label_height / old_label_height
-        new_self_width = round(self_width * width_scale)
-        new_self_height = round(self_height * height_scale)
-
-        # reposition label appropriately
-        left_label_ratio = GameInterfaceComponent.calc_offset_ratio(self_left, self_width, old_label_left, old_label_width)
-        top_label_ratio = GameInterfaceComponent.calc_offset_ratio(self_top, self_height, old_label_top, old_label_height)
-        new_label_left = GameInterfaceComponent.calc_new_position(self_left, new_label_width, new_self_width, left_label_ratio)
-        new_label_top = GameInterfaceComponent.calc_new_position(self_top, new_label_height, new_self_height, top_label_ratio)
-        label.update_position((new_label_left, new_label_top), update_component=False)
-
-        self.update_size((new_self_width, new_self_height), update_component=update_component)
-    
     #THE FOLLOWING ARE ANY STATIC METHODS
     @staticmethod
     def quick_create(name="Button", priority=0, text="Button", position=(0,0), h_align=Alignment.MIDDLE, v_align=Alignment.MIDDLE, 
