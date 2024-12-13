@@ -214,7 +214,7 @@ class Button(GameInterfaceComponent):
         #create button label
         label = Label(name=f"{name}_Label", priority=priority+1, content=text, position=position, color=text_color, font_size=text_size)
         label_size = label.get_size()
-        print(f"Label size for button {name} is {label_size}")
+        
         #prepare sizing
         button_size = (
             max(size[0], label_size[0]+(padding[0]*2)),
