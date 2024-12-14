@@ -136,9 +136,6 @@ def init_gameplay_interface():
         text_size = 50
     )
 
-    #gameplay grid
-    gameplay_grid = Grid(name="Gameplay_Grid", priority=0, position=(0,0), grid_size=(4, 4), cell_size=(32, 32))
-
     #gameplay button stuff
     gameplay_win_button = Button.quick_create(
         name = "Gameplay_Win_Button", 
@@ -168,10 +165,17 @@ def init_gameplay_interface():
     #add components to interface
     gameplay_interface.add_components([
         gameplay_title_box,
-        gameplay_grid, 
         gameplay_win_button,
         gameplay_return_button
     ])
+
+    #gameplay grid
+    grid_position = (
+        screen_positions["center_x"]//2,
+        screen_positions["center_y"]//2
+    )
+    gameplay_grid = Grid(name="Gameplay_Grid", position=grid_position, grid_size=(14, 8), cell_size=(32, 32))
+    gameplay_interface.set_grid(gameplay_grid)
     return gameplay_interface
 
 #(re)set paused game interface overlay

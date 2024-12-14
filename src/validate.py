@@ -23,6 +23,8 @@ class Validate():
     cell_size_length = 2
     cell_size_minimum = 4
     cell_size_maximum = 256
+    cell_border_thickness_minimum = 1
+    cell_border_thickness_maximum = 16
 
     #static methods
     @staticmethod
@@ -113,6 +115,13 @@ class Validate():
             raise IndexError(f"Grid Cell Size must contain exactly {Validate.cell_size_length} elements!")
         if not all((isinstance(d, int) and Validate.cell_size_minimum <= d <= Validate.cell_size_maximum) for d in cell_size):
             raise ValueError(f"Grid Cell Size must be integers of at least {Validate.cell_size_minimum} and up to {Validate.cell_size_maximum}!")
+    
+    @staticmethod
+    def cell_border_thickness(border_thickness):
+        if not isinstance(border_thickness, int):
+            raise TypeError("Grid cell border thickness must be an integer!")
+        if Validate.cell_border_thickness_minimum < border_thickness < Validate.cell_border_thickness_maximum:
+            raise ValueError(f"Grid cell border thickness must be at least {Validate.cell_border_thickness_minimum} and at most {Validate.cell_border_thickness_maximum}!")
     
     @staticmethod
     def callback(callback):

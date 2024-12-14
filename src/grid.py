@@ -4,11 +4,11 @@ from src.gameinterfacecomponent import GameInterfaceComponent
 from src.gridcell import GridCell
 
 class Grid(GameInterfaceComponent):
-    def __init__(self, name="Grid", priority=0, position=(0,0), grid_size=(1,1), cell_size=(8,8)):
+    def __init__(self, name="Grid", position=(0,0), grid_size=(1,1), cell_size=(8,8)):
         self.set_grid_size(grid_size)
         self.set_cell_size(cell_size)
+        super().__init__(name=name, position=position)
         self.reset()
-        super().__init__(name=name, priority=priority, position=position)
     
     #VALIDATION METHOD:
     @staticmethod
@@ -17,14 +17,16 @@ class Grid(GameInterfaceComponent):
             raise TypeError("Grid must be of class Grid or a subclass!")
     
     @staticmethod
-    def calc_cell_position(grid_coords, cell_size):
+    def calc_cell_position(grid_position, grid_coords, cell_size):
+        Validate.position(grid_position)
         Validate.grid_coords(grid_coords)
         Validate.cell_size(cell_size)
+        grid_x, grid_y = grid_position
         x, y = grid_coords
         w, h = cell_size
         return (
-            x*w,
-            h*y
+            grid_x + (x*w),
+            grid_y + (h*y)
         )
 
     #SETTERS, GETTERS AND OTHER CLASS METHODS:
@@ -49,10 +51,11 @@ class Grid(GameInterfaceComponent):
 
     #CELLS METHODS:
     def reset(self):
+        base_position = self.get_position()
         width, height = self.get_grid_size()
         cell_size = self.get_cell_size()
         self.__cells = [[
-                GridCell(name=f"GridCell({x},{y})", priority=1, position=Grid.calc_cell_position((x, y), cell_size), coords=(x, y), size=cell_size) 
+                GridCell(name=f"GridCell({x},{y})", position=Grid.calc_cell_position(base_position, (x, y), cell_size), coords=(x, y), size=cell_size) 
                 for x in range(width)] for y in range(height)]
     
     def get_cell(self, coords):

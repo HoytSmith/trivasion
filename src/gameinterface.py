@@ -112,11 +112,11 @@ class GameInterface():
 
     #GAMELOOP METHODS:
     def render(self, screen):
+        if self.__grid and self.__grid.is_visible():
+            self.__grid.render(screen)
         for component in self.__components:
             if component.is_visible():
                 component.render(screen)
-        if self.__grid and self.__grid.is_visible():
-            self.__grid.render(screen)
     
     def handle_event(self, event, mouse_button_held):
         for component in self.__components:
