@@ -20,6 +20,9 @@ class Validate():
     grid_coords_length = 2
     grid_coords_minimum = 0
     grid_coords_maximum = 100
+    cell_size_length = 2
+    cell_size_minimum = 4
+    cell_size_maximum = 256
 
     #static methods
     @staticmethod
@@ -101,6 +104,15 @@ class Validate():
             raise IndexError(f"Grid Coordinates must contain exactly {Validate.grid_coords_length} elements!")
         if not all((isinstance(c, int) and Validate.grid_coords_minimum <= c <= Validate.grid_coords_maximum) for c in coords):
             raise ValueError(f"Grid Coordinates must be integers of at least {Validate.grid_coords_minimum} and up to {Validate.grid_coords_maximum}!")
+    
+    @staticmethod
+    def cell_size(cell_size):
+        if not isinstance(cell_size, tuple):
+            raise TypeError("Grid Cell Size must be a tuple!")
+        if len(cell_size) != Validate.cell_size_length:
+            raise IndexError(f"Grid Cell Size must contain exactly {Validate.cell_size_length} elements!")
+        if not all((isinstance(d, int) and Validate.cell_size_minimum <= d <= Validate.cell_size_maximum) for d in cell_size):
+            raise ValueError(f"Grid Cell Size must be integers of at least {Validate.cell_size_minimum} and up to {Validate.cell_size_maximum}!")
     
     @staticmethod
     def callback(callback):

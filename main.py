@@ -9,6 +9,8 @@ from src.label import Label
 from src.box import Box
 from src.buttonstate import ButtonState
 from src.button import Button
+from src.grid import Grid
+from src.gridcell import GridCell
 
 #globals
 game_is_running = True
@@ -134,6 +136,9 @@ def init_gameplay_interface():
         text_size = 50
     )
 
+    #gameplay grid
+    gameplay_grid = Grid(name="Gameplay_Grid", priority=0, position=(0,0), grid_size=(4, 4), cell_size=(32, 32))
+
     #gameplay button stuff
     gameplay_win_button = Button.quick_create(
         name = "Gameplay_Win_Button", 
@@ -163,6 +168,7 @@ def init_gameplay_interface():
     #add components to interface
     gameplay_interface.add_components([
         gameplay_title_box,
+        gameplay_grid, 
         gameplay_win_button,
         gameplay_return_button
     ])

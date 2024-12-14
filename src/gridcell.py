@@ -1,16 +1,24 @@
 #imports
 from src.validate import Validate
+from src.gameinterfacecomponent import GameInterfaceComponent
 
-class GridCell:
-    def __init__(self, position=(0,0)):
-        self.set_position(position)
+class GridCell(GameInterfaceComponent):
+    def __init__(self, name="GridCell", priority=0, position=(0,0), coords=(0,0), size=(8,8)):
+        self.set_coords(coords)
+        super().__init__(name=name, priority=priority, position=position, size=size)
 
     #SETTERS, GETTERS AND OTHER CLASS METHODS:
-    #POSITION METHODS:
-    def set_position(self, position):
-        Validate.grid_coords(position)
-        self.__position = position
+    #COORDINATE METHODS:
+    def set_coords(self, coords):
+        Validate.grid_coords(coords)
+        self.__coords = coords
 
-    def get_position(self):
-        return self.__position
+    def get_coords(self):
+        return self.__coords
     
+    #GAMELOOP METHODS:
+    #def render(self, screen):
+    #    pass
+
+    def handle_event(self, event, mouse_button_held):
+        return False
