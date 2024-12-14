@@ -17,6 +17,9 @@ class Validate():
     alpha_maximum = 255
     font_size_minimum = 8
     font_size_maximum = 100
+    grid_coords_length = 2
+    grid_coords_minimum = 0
+    grid_coords_maximum = 100
 
     #static methods
     @staticmethod
@@ -89,6 +92,15 @@ class Validate():
             raise TypeError("Font size must be of type integer!")
         if font_size < Validate.font_size_minimum or font_size > Validate.font_size_maximum:
             raise ValueError(f"Font size must be greater than {Validate.font_size_minimum} and at most {Validate.font_size_maximum}!")
+    
+    @staticmethod
+    def grid_coords(coords):
+        if not isinstance(coords, tuple):
+            raise TypeError("Grid Coordinates must be a tuple!")
+        if len(coords) != Validate.grid_coords_length:
+            raise IndexError(f"Grid Coordinates must contain exactly {Validate.grid_coords_length} elements!")
+        if not all((isinstance(c, int) and Validate.grid_coords_minimum <= c <= Validate.grid_coords_maximum) for c in coords):
+            raise ValueError(f"Grid Coordinates must be integers of at least {Validate.grid_coords_minimum} and up to {Validate.grid_coords_maximum}!")
     
     @staticmethod
     def callback(callback):
