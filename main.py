@@ -14,7 +14,7 @@ from src.gridcell import GridCell
 
 #globals
 game_is_running = True
-game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json")
+game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json", "OPTIONS_SETTINGS.json")
 current_state = GameState.START
 pending_state = None
 interfaces = {}
@@ -33,9 +33,16 @@ pause_keys = [pygame.K_p, pygame.K_ESCAPE]
 
 #initializes the game. resets everything when called again later
 def init_game():
-    init_pygame()
+    init_settings()
     init_interfaces()
     change_state(GameState.MENU)
+
+#initializes settings
+def init_settings():
+    global game_settings
+    if not game_settings:
+        game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json", "OPTIONS_SETTINGS.json")
+    game_settings.load_selected_options()
 
 #initialize everything related to pygame
 def init_pygame():
@@ -54,6 +61,8 @@ def init_display():
     screen_positions = {
         "top" : 0,
         "left" : 0,
+        "tithe_x" : resolution[0]//10,
+        "tithe_y" : resolution[1]//10,
         "center_x" : resolution[0]//2,
         "center_y" : resolution[1]//2,
         "right" : resolution[0],
@@ -68,28 +77,411 @@ def init_menu_interface():
     #menu title stuff
     menu_title_box = Box.create_text_box(
         name = "Menu_Title_Box", 
-        text = "Main Menu", 
+        text = "TriVasion!", 
         position = (
-            screen_positions["center_x"], 
-            50
+            screen_positions["center_x"],
+            screen_positions["tithe_y"]
         ), 
         v_align = Alignment.START, 
         size = (
             screen_positions["right"], 
-            50
+            screen_positions["tithe_y"]
         ), 
         padding = (10, 5), 
         box_color = (100, 100, 100), 
-        text_size = 50
+        text_size = 64
     )
+
+    # menu options panel: 
+    # options_title 
+    menu_options_title = Box.create_text_box(
+        name = "Menu_Options_Title", 
+        text = "Options", 
+        position = (
+            screen_positions["center_x"]//2,
+            screen_positions["tithe_y"]*2
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]*2,
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        text_size = 42
+    )
+    # options_panel 
+    menu_options_panel = Box(
+        name = "Menu_Options_Panel",
+        position = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"] * 3
+        ),
+        size = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"] * 6
+        ),
+        color = (255, 64, 64)
+    )
+    # options_waves 
+    menu_options_waves_row = Box(
+        name = "Menu_Options_Waves_Row",
+        position = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"] * 3
+        ),
+        size = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"]
+        ),
+        color = (255, 0, 0),
+        alpha = 128
+    )
+    menu_options_waves_title = Box.create_text_box(
+        name = "Menu_Options_Waves_Title", 
+        priority = 1,
+        text = "Waves:", 
+        position = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"] * 3
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_waves_selected = Box.create_text_box(
+        name = "Menu_Options_Waves_Selected", 
+        priority = 1,
+        text = str(game_settings.get_selected_option("waves")), 
+        position = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"] * 3
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_waves_row.add_children([
+        menu_options_waves_title,
+        menu_options_waves_selected
+    ])
+    # options_difficulty 
+    menu_options_difficulty_row = Box(
+        name = "Menu_Options_Difficulty_Row",
+        position = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"] * 4
+        ),
+        size = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"]
+        ),
+        color = (255, 0, 0),
+        alpha = 128
+    )
+    menu_options_difficulty_title = Box.create_text_box(
+        name = "Menu_Options_Difficulty_Title", 
+        priority = 1,
+        text = "Difficulty:", 
+        position = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"] * 4
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_difficulty_selected = Box.create_text_box(
+        name = "Menu_Options_Difficulty_Selected", 
+        priority = 1,
+        text = str(game_settings.get_selected_option("difficulty")), 
+        position = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"] * 4
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_difficulty_row.add_children([
+        menu_options_difficulty_title,
+        menu_options_difficulty_selected
+    ])
+    # options_volume 
+    menu_options_volume_row = Box(
+        name = "Menu_Options_Volume_Row",
+        position = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"] * 5
+        ),
+        size = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"]
+        ),
+        color = (255, 0, 0),
+        alpha = 128
+    )
+    menu_options_volume_title = Box.create_text_box(
+        name = "Menu_Options_Volume_Title", 
+        priority = 1,
+        text = "Volume:", 
+        position = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"] * 5
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_volume_selected = Box.create_text_box(
+        name = "Menu_Options_Volume_Selected", 
+        priority = 1,
+        text = str(game_settings.get_selected_option("volume")), 
+        position = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"] * 5
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_volume_row.add_children([
+        menu_options_volume_title,
+        menu_options_volume_selected
+    ])
+    # options_fullscreen 
+    menu_options_fullscreen_row = Box(
+        name = "Menu_Options_Fullscreen_Row",
+        position = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"] * 6
+        ),
+        size = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"]
+        ),
+        color = (255, 0, 0),
+        alpha = 128
+    )
+    menu_options_fullscreen_title = Box.create_text_box(
+        name = "Menu_Options_Fullscreen_Title", 
+        priority = 1,
+        text = "Fullscreen:", 
+        position = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"] * 6
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_fullscreen_selected = Box.create_text_box(
+        name = "Menu_Options_Fullscreen_Selected", 
+        priority = 1,
+        text = str(game_settings.get_selected_option("fullscreen")), 
+        position = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"] * 6
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_fullscreen_row.add_children([
+        menu_options_fullscreen_title,
+        menu_options_fullscreen_selected
+    ])
+    # options_resolution 
+    menu_options_resolution_row = Box(
+        name = "Menu_Options_Resolution_Row",
+        position = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"] * 7
+        ),
+        size = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"]
+        ),
+        color = (255, 0, 0),
+        alpha = 128
+    )
+    menu_options_resolution_title = Box.create_text_box(
+        name = "Menu_Options_Resolution_Title", 
+        priority = 1,
+        text = "Resolution:", 
+        position = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"] * 7
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_resolution_selected = Box.create_text_box(
+        name = "Menu_Options_Resolution_Selected", 
+        priority = 1,
+        text = str(game_settings.get_selected_option("screen_resolution")), 
+        position = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"] * 7
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_resolution_row.add_children([
+        menu_options_resolution_title,
+        menu_options_resolution_selected
+    ])
+    # options_fps
+    menu_options_fps_row = Box(
+        name = "Menu_Options_FPS_Row",
+        position = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"] * 8
+        ),
+        size = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"]
+        ),
+        color = (255, 0, 0),
+        alpha = 128
+    )
+    menu_options_fps_title = Box.create_text_box(
+        name = "Menu_Options_FPS_Title", 
+        priority = 1,
+        text = "FPS:", 
+        position = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"] * 8
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 2,
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_fps_selected = Box.create_text_box(
+        name = "Menu_Options_FPS_Selected", 
+        priority = 1,
+        text = str(game_settings.get_selected_option("fps_limit")), 
+        position = (
+            screen_positions["tithe_x"] * 5,
+            screen_positions["tithe_y"] * 8
+        ), 
+        h_align = Alignment.MIDDLE, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"],
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        box_color = (0, 0, 228), 
+        alpha = 128, 
+        text_size = 36
+    )
+    menu_options_fps_row.add_children([
+        menu_options_fps_title,
+        menu_options_fps_selected
+    ])
+    # add components to menu_options_panel
+    menu_options_panel.add_children([
+        menu_options_waves_row,
+        menu_options_difficulty_row,
+        menu_options_volume_row,
+        menu_options_fullscreen_row,
+        menu_options_resolution_row,
+        menu_options_fps_row
+    ])
 
     #menu buttons
     menu_start_button = Button.quick_create(
         name = "Menu_Start_Button", 
         text = "Start Game", 
         position = (
-            screen_positions["center_x"], 
+            screen_positions["right"] - (screen_positions["tithe_x"] * 2), 
             screen_positions["center_y"]
+        ), 
+        v_align = Alignment.END,
+        size = (
+            screen_positions["tithe_x"], 
+            screen_positions["tithe_y"]
         ), 
         padding = (10, 5), 
         callback = lambda: queue_state(GameState.PLAY)
@@ -98,8 +490,13 @@ def init_menu_interface():
         name = "Menu_Quit_Button", 
         text = "Quit Game", 
         position = (
-            screen_positions["center_x"], 
-            screen_positions["center_y"]+100
+            screen_positions["right"] - (screen_positions["tithe_x"] * 2), 
+            screen_positions["center_y"] + (screen_positions["tithe_y"] * 2)
+        ), 
+        v_align = Alignment.START,
+        size = (
+            screen_positions["tithe_x"], 
+            screen_positions["tithe_y"]
         ), 
         padding = (10, 5), 
         callback = lambda: queue_state(GameState.QUIT)
@@ -108,6 +505,8 @@ def init_menu_interface():
     #add components to interface
     menu_interface.add_components([
         menu_title_box, 
+        menu_options_title, 
+        menu_options_panel, 
         menu_start_button, 
         menu_quit_button
     ])
@@ -171,10 +570,10 @@ def init_gameplay_interface():
 
     #gameplay grid
     grid_position = (
-        screen_positions["center_x"]//2,
-        screen_positions["center_y"]//2
+        screen_positions["center_x"]//4,
+        screen_positions["center_y"]//4
     )
-    gameplay_grid = Grid(name="Gameplay_Grid", position=grid_position, grid_size=(14, 8), cell_size=(32, 32))
+    gameplay_grid = Grid(name="Gameplay_Grid", position=grid_position, grid_size=(20, 12), cell_size=(32, 32))
     gameplay_interface.set_grid(gameplay_grid)
     return gameplay_interface
 
@@ -404,6 +803,7 @@ def render_game():
 #main program, contains the gameloop
 def main():
     global game_is_running, game_settings, clock, pending_state
+    init_pygame()
     init_game()
 
     #game loop
