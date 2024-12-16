@@ -70,6 +70,17 @@ class GameSettings():
     
     def get_selected_option(self, key):
         return self.selected_options[key]
+    
+    def get_selected_option_text(self, key):
+        option = self.get_selected_option(key)
+        if key == "fullscreen":
+            if option == True:
+                return "On"
+            else:
+                return "Off"
+        if key == "screen_resolution":
+            return f"{option[0]}x{option[1]}"
+        return str(option)
 
     def get_selected_option_index(self, key):
         options = self.settings_options[key]

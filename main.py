@@ -160,7 +160,7 @@ def init_menu_interface():
     menu_options_waves_selected = Box.create_text_box(
         name = "Menu_Options_Waves_Selected", 
         priority = 1,
-        text = str(game_settings.get_selected_option("waves")), 
+        text = game_settings.get_selected_option_text("waves"), 
         position = (
             screen_positions["tithe_x"] * 5,
             screen_positions["tithe_y"] * 3
@@ -216,7 +216,7 @@ def init_menu_interface():
     menu_options_difficulty_selected = Box.create_text_box(
         name = "Menu_Options_Difficulty_Selected", 
         priority = 1,
-        text = str(game_settings.get_selected_option("difficulty")), 
+        text = game_settings.get_selected_option_text("difficulty"), 
         position = (
             screen_positions["tithe_x"] * 5,
             screen_positions["tithe_y"] * 4
@@ -272,7 +272,7 @@ def init_menu_interface():
     menu_options_volume_selected = Box.create_text_box(
         name = "Menu_Options_Volume_Selected", 
         priority = 1,
-        text = str(game_settings.get_selected_option("volume")), 
+        text = game_settings.get_selected_option_text("volume"), 
         position = (
             screen_positions["tithe_x"] * 5,
             screen_positions["tithe_y"] * 5
@@ -328,7 +328,7 @@ def init_menu_interface():
     menu_options_fullscreen_selected = Box.create_text_box(
         name = "Menu_Options_Fullscreen_Selected", 
         priority = 1,
-        text = str(game_settings.get_selected_option("fullscreen")), 
+        text = game_settings.get_selected_option_text("fullscreen"), 
         position = (
             screen_positions["tithe_x"] * 5,
             screen_positions["tithe_y"] * 6
@@ -384,7 +384,7 @@ def init_menu_interface():
     menu_options_resolution_selected = Box.create_text_box(
         name = "Menu_Options_Resolution_Selected", 
         priority = 1,
-        text = str(game_settings.get_selected_option("screen_resolution")), 
+        text = game_settings.get_selected_option_text("screen_resolution"), 
         position = (
             screen_positions["tithe_x"] * 5,
             screen_positions["tithe_y"] * 7
@@ -440,7 +440,7 @@ def init_menu_interface():
     menu_options_fps_selected = Box.create_text_box(
         name = "Menu_Options_FPS_Selected", 
         priority = 1,
-        text = str(game_settings.get_selected_option("fps_limit")), 
+        text = game_settings.get_selected_option_text("fps_limit"), 
         position = (
             screen_positions["tithe_x"] * 5,
             screen_positions["tithe_y"] * 8
