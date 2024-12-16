@@ -1,6 +1,6 @@
 {
     "waves" : 10,
-    "difficulty" : "normal",
+    "difficulty" : "Normal",
     "volume" : 50,
     "fullscreen" : false,
     "screen_resolution": [

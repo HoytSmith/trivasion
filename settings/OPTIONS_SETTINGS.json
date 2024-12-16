@@ -1,15 +1,15 @@
 {
-    "wave_counts" : [
+    "waves" : [
         5,
         10,
         15
     ],
-    "difficulties" : [
-        "easy",
-        "normal",
-        "hard"
+    "difficulty" : [
+        "Easy",
+        "Normal",
+        "Hard"
     ],
-    "volumes" : [
+    "volume" : [
         0,
         10,
         20,
@@ -26,7 +26,7 @@
         true,
         false
     ],
-    "resolutions": [
+    "screen_resolution": [
         [
             1280,
             720
@@ -52,7 +52,7 @@
             1440
         ]
     ],
-    "fps_limits" : [
+    "fps_limit" : [
         30,
         60,
         75,
