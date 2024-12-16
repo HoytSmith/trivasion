@@ -1,8 +1,11 @@
 {
-    "screen_resolution": [
-        800,
-        600
-    ],
+    "waves" : 10,
+    "difficulty" : "normal",
+    "volume" : 50,
     "fullscreen" : false,
+    "screen_resolution": [
+        1280,
+        720
+    ],
     "fps_limit" : 60
 }
