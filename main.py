@@ -219,6 +219,23 @@ def init_menu_interface():
         ),
         color = (255, 64, 64)
     )
+    # save options button
+    menu_options_save_button = Button.quick_create(
+        name = "Menu_Options_Save_Button", 
+        text = "Save", 
+        position = (
+            screen_positions["center_x"]//2,
+            screen_positions["tithe_y"] * 9
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]*2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = lambda : game_settings.apply_selection_options()
+    )
     # options_waves 
     menu_options_waves_row = generate_options_row("waves", 1)
     # options_difficulty 
@@ -278,6 +295,7 @@ def init_menu_interface():
         menu_title_box, 
         menu_options_title, 
         menu_options_panel, 
+        menu_options_save_button, 
         menu_start_button, 
         menu_quit_button
     ])
