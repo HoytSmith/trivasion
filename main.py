@@ -176,9 +176,43 @@ def init_menu_interface():
         alpha = 128, 
         text_size = 36
     )
+    menu_options_waves_previous_button = Button.quick_create(
+        name = "Menu_Options_Waves_Previous_Button", 
+        text = "<", 
+        position = (
+            screen_positions["tithe_x"] * 4,
+            screen_positions["tithe_y"] * 3
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
+    menu_options_waves_next_button = Button.quick_create(
+        name = "Menu_Options_Waves_Next_Button", 
+        text = ">", 
+        position = (
+            screen_positions["tithe_x"] * 6,
+            screen_positions["tithe_y"] * 3
+        ), 
+        h_align = Alignment.END, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
     menu_options_waves_row.add_children([
         menu_options_waves_title,
-        menu_options_waves_selected
+        menu_options_waves_selected,
+        menu_options_waves_previous_button,
+        menu_options_waves_next_button
     ])
     # options_difficulty 
     menu_options_difficulty_row = Box(
@@ -232,9 +266,43 @@ def init_menu_interface():
         alpha = 128, 
         text_size = 36
     )
+    menu_options_difficulty_previous_button = Button.quick_create(
+        name = "Menu_Options_Difficulty_Previous_Button", 
+        text = "<", 
+        position = (
+            screen_positions["tithe_x"] * 4,
+            screen_positions["tithe_y"] * 4
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
+    menu_options_difficulty_next_button = Button.quick_create(
+        name = "Menu_Options_Difficulty_Next_Button", 
+        text = ">", 
+        position = (
+            screen_positions["tithe_x"] * 6,
+            screen_positions["tithe_y"] * 4
+        ), 
+        h_align = Alignment.END, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
     menu_options_difficulty_row.add_children([
         menu_options_difficulty_title,
-        menu_options_difficulty_selected
+        menu_options_difficulty_selected,
+        menu_options_difficulty_previous_button,
+        menu_options_difficulty_next_button
     ])
     # options_volume 
     menu_options_volume_row = Box(
@@ -288,9 +356,43 @@ def init_menu_interface():
         alpha = 128, 
         text_size = 36
     )
+    menu_options_volume_previous_button = Button.quick_create(
+        name = "Menu_Options_Volume_Previous_Button", 
+        text = "<", 
+        position = (
+            screen_positions["tithe_x"] * 4,
+            screen_positions["tithe_y"] * 5
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
+    menu_options_volume_next_button = Button.quick_create(
+        name = "Menu_Options_Volume_Next_Button", 
+        text = ">", 
+        position = (
+            screen_positions["tithe_x"] * 6,
+            screen_positions["tithe_y"] * 5
+        ), 
+        h_align = Alignment.END, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
     menu_options_volume_row.add_children([
         menu_options_volume_title,
-        menu_options_volume_selected
+        menu_options_volume_selected,
+        menu_options_volume_previous_button,
+        menu_options_volume_next_button
     ])
     # options_fullscreen 
     menu_options_fullscreen_row = Box(
@@ -344,9 +446,43 @@ def init_menu_interface():
         alpha = 128, 
         text_size = 36
     )
+    menu_options_fullscreen_previous_button = Button.quick_create(
+        name = "Menu_Options_Fullscreen_Previous_Button", 
+        text = "<", 
+        position = (
+            screen_positions["tithe_x"] * 4,
+            screen_positions["tithe_y"] * 6
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
+    menu_options_fullscreen_next_button = Button.quick_create(
+        name = "Menu_Options_Fullscreen_Next_Button", 
+        text = ">", 
+        position = (
+            screen_positions["tithe_x"] * 6,
+            screen_positions["tithe_y"] * 6
+        ), 
+        h_align = Alignment.END, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
     menu_options_fullscreen_row.add_children([
         menu_options_fullscreen_title,
-        menu_options_fullscreen_selected
+        menu_options_fullscreen_selected,
+        menu_options_fullscreen_previous_button,
+        menu_options_fullscreen_next_button
     ])
     # options_resolution 
     menu_options_resolution_row = Box(
@@ -400,9 +536,43 @@ def init_menu_interface():
         alpha = 128, 
         text_size = 36
     )
+    menu_options_resolution_previous_button = Button.quick_create(
+        name = "Menu_Options_Resolution_Previous_Button", 
+        text = "<", 
+        position = (
+            screen_positions["tithe_x"] * 4,
+            screen_positions["tithe_y"] * 7
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
+    menu_options_resolution_next_button = Button.quick_create(
+        name = "Menu_Options_Resolution_Next_Button", 
+        text = ">", 
+        position = (
+            screen_positions["tithe_x"] * 6,
+            screen_positions["tithe_y"] * 7
+        ), 
+        h_align = Alignment.END, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
     menu_options_resolution_row.add_children([
         menu_options_resolution_title,
-        menu_options_resolution_selected
+        menu_options_resolution_selected,
+        menu_options_resolution_previous_button,
+        menu_options_resolution_next_button
     ])
     # options_fps
     menu_options_fps_row = Box(
@@ -456,9 +626,43 @@ def init_menu_interface():
         alpha = 128, 
         text_size = 36
     )
+    menu_options_fps_previous_button = Button.quick_create(
+        name = "Menu_Options_FPS_Previous_Button", 
+        text = "<", 
+        position = (
+            screen_positions["tithe_x"] * 4,
+            screen_positions["tithe_y"] * 8
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
+    menu_options_fps_next_button = Button.quick_create(
+        name = "Menu_Options_FPS_Next_Button", 
+        text = ">", 
+        position = (
+            screen_positions["tithe_x"] * 6,
+            screen_positions["tithe_y"] * 8
+        ), 
+        h_align = Alignment.END, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"]//2, 
+            screen_positions["tithe_y"]
+        ), 
+        padding = (4, 2), 
+        callback = None
+    )
     menu_options_fps_row.add_children([
         menu_options_fps_title,
-        menu_options_fps_selected
+        menu_options_fps_selected,
+        menu_options_fps_previous_button,
+        menu_options_fps_next_button
     ])
     # add components to menu_options_panel
     menu_options_panel.add_children([
