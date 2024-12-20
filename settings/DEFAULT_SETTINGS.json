@@ -3,9 +3,9 @@
     "difficulty" : "Normal",
     "volume" : 50,
     "fullscreen" : false,
-    "screen_resolution": [
+    "resolution": [
         1280,
         720
     ],
-    "fps_limit" : 60
+    "fps" : 60
 }

@@ -78,7 +78,7 @@ class GameSettings():
                 return "On"
             else:
                 return "Off"
-        if key == "screen_resolution":
+        if key == "resolution":
             return f"{option[0]}x{option[1]}"
         return str(option)
 
@@ -101,19 +101,17 @@ class GameSettings():
             self.game_settings = self.selected_options.copy()
         self.save_settings()
     
-    def select_next_option(self, key, current_index):
-        selected_option = self.get_selected_option(key)
+    def select_next_option(self, key):
+        current_index = self.get_selected_option_index(key)
         options = self.settings_options[key]
         next_index = current_index+1
         if next_index < len(options):
-            selected_option = options[next_index]
-            self.selected_options[key] = selected_option
-        return selected_option
+            self.selected_options[key] = options[next_index]
+        return self.get_selected_option_text(key)
 
-    def select_previous_option(self, key, current_index):
-        selected_option = self.get_selected_option(key)
+    def select_previous_option(self, key):
+        current_index = self.get_selected_option_index(key)
         next_index = current_index-1
         if next_index >= 0:
-            selected_option = self.settings_options[key][next_index]
-            self.selected_options[key] = selected_option
-        return selected_option
+            self.selected_options[key] = self.settings_options[key][next_index]
+        return self.get_selected_option_text(key)

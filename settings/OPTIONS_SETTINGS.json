@@ -26,7 +26,7 @@
         true,
         false
     ],
-    "screen_resolution": [
+    "resolution": [
         [
             1280,
             720
@@ -52,7 +52,7 @@
             1440
         ]
     ],
-    "fps_limit" : [
+    "fps" : [
         30,
         60,
         75,
