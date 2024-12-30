@@ -72,6 +72,7 @@ def init_display():
 #(re)set main menu interface
 def init_menu_interface():
     def generate_options_row(option, row_number):
+        global game_settings
         row_number += 2
         capitalized = option.capitalize()
         row = Box(
@@ -166,7 +167,7 @@ def init_menu_interface():
         ])
         return row
     
-    global screen_positions
+    global screen_positions, game_settings
     menu_interface = GameInterface(priority=0)
 
     #menu title stuff
@@ -301,69 +302,187 @@ def init_menu_interface():
     ])
     return menu_interface
 
+# idea for gameplay interface:
+# 1. Game Grid
+# - (0 , 0), 80% width, 80% height 
+# 2. Tower Panel 
+# 3. Information Panel 
+
 #(re)set gameplay interface
 def init_gameplay_interface():
-    global screen_positions
+    global screen_positions, game_settings
     gameplay_interface = GameInterface(priority=0)
 
-    #gameplay title stuff
-    gameplay_title_box = Box.create_text_box(
-        name = "Gameplay_Title_Box", 
-        text = "Gameplay", 
+    #gameplay grid
+    gameplay_grid = Grid(name="Gameplay_Grid", position=(0, 0), grid_size=(20, 12), cell_size=(32, 32))
+    gameplay_interface.set_grid(gameplay_grid)
+
+    #Tower Panel
+    # Circle Tower Button
+    # Circle Tower Cost Label
+    # Square Tower Button
+    # Square Tower Cost Label
+    # Hexagon Tower Button
+    # Hexagon Tower Cost Label
+    # Octagon Tower Button
+    # Octagon Tower Cost Label
+
+    #Information Panel
+    information_panel = Box(
+        name="Information_Panel", 
+        priority=1, 
+        position=(
+            0, 
+            screen_positions["tithe_y"] * 8
+        ),
+        size=(
+            screen_positions["right"], 
+            screen_positions["tithe_y"] * 2
+        ),
+        color=(100, 100, 100),
+        alpha=128
+    )
+    # Lives Label
+    lives_label = Box.create_text_box(
+        name = "Lives_Label", 
+        text = "Lives: 10", 
         position = (
-            screen_positions["center_x"], 
-            50
+            0, 
+            screen_positions["tithe_y"] * 8
         ), 
+        h_align = Alignment.START, 
         v_align = Alignment.START, 
         size = (
-            screen_positions["right"], 
-            50
+            screen_positions["tithe_x"] * 3, 
+            screen_positions["tithe_y"]
         ), 
-        padding = (10, 5), 
-        box_color = (100, 100, 100), 
-        text_size = 50
+        box_color = (0, 0, 0), 
+        alpha = 128, 
+        text_color = (255, 255, 255), 
+        text_size = 30
     )
-
-    #gameplay button stuff
-    gameplay_win_button = Button.quick_create(
-        name = "Gameplay_Win_Button", 
-        text = "Win the Game", 
+    # Credits Label
+    credits_label = Box.create_text_box(
+        name = "Credits_Label", 
+        text = "Credits: 100", 
         position = (
-            screen_positions["center_x"]-50, 
-            screen_positions["bottom"]-100
+            0, 
+            screen_positions["tithe_y"] * 9
         ), 
-        h_align = Alignment.END,
-        v_align = Alignment.END, 
-        padding = (10, 5), 
-        callback = lambda: queue_state(GameState.END)
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 3, 
+            screen_positions["tithe_y"]
+        ), 
+        box_color = (0, 0, 0), 
+        alpha = 128, 
+        text_color = (255, 255, 255), 
+        text_size = 30
     )
-    gameplay_return_button = Button.quick_create(
-        name = "Gameplay_Return_Button", 
-        text = "Return to Main Menu", 
+    # Play Pause Button
+    play_pause_button = Button.quick_create(
+        name = "Play_Pause_Button", 
+        text = ">", 
         position = (
-            screen_positions["center_x"]+50, 
-            screen_positions["bottom"]-100
+            screen_positions["tithe_x"] * 4, 
+            screen_positions["tithe_y"] * 8
         ), 
-        h_align = Alignment.START,
-        v_align = Alignment.END, 
-        padding = (10, 5), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"], 
+            screen_positions["tithe_y"]
+        ),
+        padding = (4, 2), 
+        callback = lambda: queue_state(GameState.PAUSE)
+    )
+    # Fast Forward Button
+    fast_forward_button = Button.quick_create(
+        name = "Fast_Foward_Button", 
+        text = ">>", 
+        position = (
+            screen_positions["tithe_x"] * 5, 
+            screen_positions["tithe_y"] * 8
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"], 
+            screen_positions["tithe_y"]
+        ),
+        padding = (4, 2), 
+        callback = None
+    )
+    # Waves Label
+    waves_label = Box.create_text_box(
+        name = "Waves_Label", 
+        text = "Wave: 1/10", 
+        position = (
+            screen_positions["tithe_x"] * 4, 
+            screen_positions["tithe_y"] * 9
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 2, 
+            screen_positions["tithe_y"]
+        ), 
+        box_color = (0, 0, 0), 
+        alpha = 128, 
+        text_color = (255, 255, 255), 
+        text_size = 24
+    )
+    # Main Menu Button
+    main_menu_button = Button.quick_create(
+        name = "Main_Menu_Button", 
+        text = "Main Menu", 
+        position = (
+            screen_positions["tithe_x"] * 7, 
+            screen_positions["tithe_y"] * 8
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 3, 
+            screen_positions["tithe_y"]
+        ),
+        padding = (4, 2), 
         callback = lambda: queue_state(GameState.START)
     )
+    # Quit Game Button
+    quit_game_button = Button.quick_create(
+        name = "Quit_Game_Button", 
+        text = "Quit Game", 
+        position = (
+            screen_positions["tithe_x"] * 7, 
+            screen_positions["tithe_y"] * 9
+        ), 
+        h_align = Alignment.START, 
+        v_align = Alignment.START, 
+        size = (
+            screen_positions["tithe_x"] * 3, 
+            screen_positions["tithe_y"]
+        ),
+        padding = (4, 2), 
+        callback = lambda: queue_state(GameState.QUIT)
+    )
+    # Add Information Panel Components
+    information_panel.add_children([
+        lives_label,
+        credits_label,
+        play_pause_button,
+        fast_forward_button,
+        waves_label,
+        main_menu_button,
+        quit_game_button
+    ])
 
     #add components to interface
     gameplay_interface.add_components([
-        gameplay_title_box,
-        gameplay_win_button,
-        gameplay_return_button
+        information_panel
     ])
 
-    #gameplay grid
-    grid_position = (
-        screen_positions["center_x"]//4,
-        screen_positions["center_y"]//4
-    )
-    gameplay_grid = Grid(name="Gameplay_Grid", position=grid_position, grid_size=(20, 12), cell_size=(32, 32))
-    gameplay_interface.set_grid(gameplay_grid)
     return gameplay_interface
 
 #(re)set paused game interface overlay
