@@ -25,8 +25,9 @@ class Validate():
     cell_size_maximum = 256
     cell_border_thickness_minimum = 1
     cell_border_thickness_maximum = 16
+    waves_options = [5, 10, 15]
+    difficulty_options = ["Easy", "Normal", "Hard"]
 
-    #static methods
     @staticmethod
     def name(name):
         if not isinstance(name, str):
@@ -123,6 +124,19 @@ class Validate():
         if Validate.cell_border_thickness_minimum < border_thickness < Validate.cell_border_thickness_maximum:
             raise ValueError(f"Grid cell border thickness must be at least {Validate.cell_border_thickness_minimum} and at most {Validate.cell_border_thickness_maximum}!")
     
+    @staticmethod
+    def difficulty(difficulty):
+        if not isinstance(difficulty, str):
+            raise TypeError("Difficulty must be a string!")
+        if not difficulty in Validate.difficulty_options:
+            raise ValueError(f"{difficulty} is an invalid Difficulty option!")
+    
+    def waves(waves):
+        if not isinstance(waves, int):
+            raise TypeError("Waves must be an integer!")
+        if not waves in Validate.waves_options:
+            raise ValueError(f"{waves} is an invalid Waves option!")
+
     @staticmethod
     def callback(callback):
         if not callable(callback):
