@@ -9,6 +9,7 @@ from src.label import Label
 from src.box import Box
 from src.buttonstate import ButtonState
 from src.button import Button
+from src.level import Level
 from src.grid import Grid
 from src.gridcell import GridCell
 
@@ -30,12 +31,18 @@ screen_positions = {
 }
 mouse_button_held = False
 pause_keys = [pygame.K_p, pygame.K_ESCAPE]
+level = None
 
 #initializes the game. resets everything when called again later
 def init_game():
     init_settings()
     init_interfaces()
     change_state(GameState.MENU)
+
+#initializes the game's level
+def init_level():
+    global game_settings, level
+    level = Level(waves=game_settings.get_setting("waves"), difficulty=game_settings.get_setting("difficulty"))
 
 #initializes settings
 def init_settings():
@@ -302,20 +309,14 @@ def init_menu_interface():
     ])
     return menu_interface
 
-# idea for gameplay interface:
-# 1. Game Grid
-# - (0 , 0), 80% width, 80% height 
-# 2. Tower Panel 
-# 3. Information Panel 
-
 #(re)set gameplay interface
 def init_gameplay_interface():
     global screen_positions, game_settings
     gameplay_interface = GameInterface(priority=0)
 
     #gameplay grid
-    gameplay_grid = Grid(name="Gameplay_Grid", position=(0, 0), grid_size=(20, 12), cell_size=(32, 32))
-    gameplay_interface.set_grid(gameplay_grid)
+    #gameplay_grid = Grid(name="Gameplay_Grid", position=(0, 0), grid_size=(20, 12), cell_size=(32, 32))
+    #gameplay_interface.set_grid(gameplay_grid)
 
     #Tower Panel
     tower_panel = Box(
@@ -386,7 +387,7 @@ def init_gameplay_interface():
     # Square Tower Cost Label
     square_tower_cost = Box.create_text_box(
         name = "Square_Tower_Cost", 
-        text = "Cost: 10", 
+        text = "Cost: 25", 
         position = (
             screen_positions["tithe_x"] * 9, 
             screen_positions["tithe_y"] * 4
@@ -421,7 +422,7 @@ def init_gameplay_interface():
     # Hexagon Tower Cost Label
     hexagon_tower_cost = Box.create_text_box(
         name = "Hexagon_Tower_Cost", 
-        text = "Cost: 10", 
+        text = "Cost: 25", 
         position = (
             screen_positions["tithe_x"] * 9, 
             screen_positions["tithe_y"] * 6
@@ -456,7 +457,7 @@ def init_gameplay_interface():
     # Octagon Tower Cost Label
     octagon_tower_cost = Box.create_text_box(
         name = "Octagon_Tower_Cost", 
-        text = "Cost: 10", 
+        text = "Cost: 50", 
         position = (
             screen_positions["tithe_x"] * 9, 
             screen_positions["tithe_y"] * 8
@@ -540,7 +541,7 @@ def init_gameplay_interface():
     # Play Pause Button
     play_pause_button = Button.quick_create(
         name = "Play_Pause_Button", 
-        text = ">", 
+        text = "||", 
         position = (
             screen_positions["tithe_x"] * 4, 
             screen_positions["tithe_y"] * 8
@@ -803,6 +804,7 @@ def change_state(new_state):
     gameover = get_interface(GameState.END)
 
     #switch to new state
+    previous_state = current_state
     current_state = new_state
     if current_state == GameState.QUIT:
         game_is_running = False
@@ -811,42 +813,49 @@ def change_state(new_state):
     elif current_state == GameState.MENU:
         menu.show()
         menu.activate()
-    elif current_state.value >= GameState.PLAY.value:
-        menu.hide()
-        menu.deactivate()
-        gameplay.show()
-        if current_state == GameState.PLAY:
+    elif current_state == GameState.PLAY:
+        if previous_state == GameState.MENU:
+            menu.hide()
+            menu.deactivate()
+            init_level()
+        elif previous_state == GameState.PAUSE:
             gamepause.deactivate()
             gamepause.hide()
-            gameplay.activate()
-        elif current_state == GameState.PAUSE:
-            gameplay.deactivate()
-            gamepause.show()
-            gamepause.activate()
-        elif current_state == GameState.END:
-            gameplay.deactivate()
-            gameover.show()
-            gameover.activate()
+        gameplay.show()
+        gameplay.activate()
+    elif current_state == GameState.PAUSE:
+        gameplay.deactivate()
+        gamepause.show()
+        gamepause.activate()
+    elif current_state == GameState.END:
+        gameplay.deactivate()
+        gameover.show()
+        gameover.activate()
 
 #called during gameloop to handle events
 def handle_events():
-    global game_is_running, pending_state, interfaces, mouse_button_held, pause_keys
+    global game_is_running, pending_state, interfaces, mouse_button_held, pause_keys, current_state
     for event in pygame.event.get():
+        event_consumed = False
         if event.type == pygame.QUIT:
             game_is_running = False
             return
         if event.type == pygame.KEYDOWN:
             if event.key in pause_keys and current_state == GameState.PLAY:
                 queue_state(GameState.PAUSE)
+                event_consumed = True
         #Ensure only first frame of MOUSEBUTTONDOWN is processed
         toggle_mouse_state = (
             (event.type == pygame.MOUSEBUTTONDOWN and not mouse_button_held) or 
             (event.type == pygame.MOUSEBUTTONUP and mouse_button_held)
         )
 
+        if level and not event_consumed:
+            event_consumed = level.handle_event(event, mouse_button_held)
+        
         for interface in interfaces.values():
-            if interface.is_active():
-                interface.handle_event(event, mouse_button_held)
+            if interface.is_active() and not event_consumed:
+                event_consumed = interface.handle_event(event, mouse_button_held)
         
         #Mouse state is toggled after event is consumed
         if toggle_mouse_state:
@@ -859,12 +868,28 @@ def handle_events():
 
 #called during gameloop to render the game
 def render_game():
-    global screen, interfaces
+    global screen, interfaces, current_state
+
+    #reset screen
     screen.fill("black")
+
+    #render game grid first
+    if current_state == GameState.PLAY or current_state == GameState.PAUSE or current_state == GameState.END:
+        level.render(screen)
+    
+    #render interfaces on top
     for i in interfaces:
         if interfaces[i].is_visible():
             interfaces[i].render(screen)
+    
+    #finish rendering
     pygame.display.flip()
+
+#called during gameloop to update in-game logic
+def update_game(delta_time):
+    global current_state, level
+    if current_state == GameState.PLAY:
+        level.update(delta_time)
 
 #main program, contains the gameloop
 def main():
@@ -877,6 +902,7 @@ def main():
         #events
         handle_events()
         #tick update logic
+        update_game(clock.get_time())
         #draw update logic
         render_game()
         

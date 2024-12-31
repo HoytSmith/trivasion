@@ -41,11 +41,27 @@ class Level():
     def get_grid(self):
         return self.__grid
     
-    def calc_grid_size():
-        pass
+    def calc_grid_size(self):
+        waves = self.get_waves()
+        waves_modifier = round(waves / 5) - 1
+
+        diff = self.get_difficulty()
+        diff_modifier = 1
+
+        if diff == "Easy":
+            diff_modifier = 0
+        if diff == "Hard":
+            diff_modifier = 2
+        
+        size_modifier = 4 + waves_modifier + diff_modifier
+        return (
+            size_modifier * 8,
+            size_modifier * 4
+        )
 
     def create_grid(self):
-        pass
+        grid_size = self.calc_grid_size()
+        self.set_grid(Grid(name="Gameplay_Grid", position=(0, 0), grid_size=grid_size, cell_size=(32, 32)))
     
     #GAMELOOP METHODS:
     def render(self, screen):
@@ -53,3 +69,6 @@ class Level():
 
     def handle_event(self, event, mouse_button_held):
         return self.__grid.handle_event(event, mouse_button_held)
+    
+    def update(self, delta_time):
+        pass
