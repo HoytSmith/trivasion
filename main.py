@@ -311,12 +311,48 @@ def init_menu_interface():
 
 #(re)set gameplay interface
 def init_gameplay_interface():
+    def generate_tower_picker(name, pos, cost, callback):
+        global screen_positions
+        
+        #Tower Picker Button
+        picker_button = Button.quick_create(
+            name = f"{name}_Tower_Picker", 
+            text = f"{name} Tower", 
+            position = (
+                screen_positions["tithe_x"] * 9, 
+                screen_positions["tithe_y"] * (2 * pos - 1)
+            ), 
+            h_align = Alignment.MIDDLE, 
+            v_align = Alignment.MIDDLE, 
+            size = (
+                screen_positions["tithe_x"], 
+                screen_positions["tithe_y"]
+            ),
+            callback = callback
+        )
+        #Tower Cost Label
+        cost_label = Box.create_text_box(
+            name = f"{name}_Tower_Cost", 
+            text = f"Cost: {cost}", 
+            position = (
+                screen_positions["tithe_x"] * 9, 
+                screen_positions["tithe_y"] * (2 * pos)
+            ), 
+            h_align = Alignment.MIDDLE, 
+            v_align = Alignment.END, 
+            size = (
+                screen_positions["tithe_x"], 
+                screen_positions["tithe_y"] // 2
+            ), 
+            box_color = (0, 0, 0), 
+            alpha = 128, 
+            text_color = (255, 255, 255), 
+            text_size = 24
+        )
+
+        return [picker_button, cost_label]
     global screen_positions, game_settings
     gameplay_interface = GameInterface(priority=0)
-
-    #gameplay grid
-    #gameplay_grid = Grid(name="Gameplay_Grid", position=(0, 0), grid_size=(20, 12), cell_size=(32, 32))
-    #gameplay_interface.set_grid(gameplay_grid)
 
     #Tower Panel
     tower_panel = Box(
@@ -333,157 +369,14 @@ def init_gameplay_interface():
         color=(100, 100, 100),
         alpha=128
     )
-    # Circle Tower Button
-    circle_tower_picker = Button.quick_create(
-        name = "Circle_Tower_Picker", 
-        text = "Circle Tower", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"]
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.MIDDLE, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ),
-        callback = None
-    )
-    # Circle Tower Cost Label
-    circle_tower_cost = Box.create_text_box(
-        name = "Circle_Tower_Cost", 
-        text = "Cost: 10", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"] * 2
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.END, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"] // 2
-        ), 
-        box_color = (0, 0, 0), 
-        alpha = 128, 
-        text_color = (255, 255, 255), 
-        text_size = 24
-    )
-    # Square Tower Button
-    square_tower_picker = Button.quick_create(
-        name = "Square_Tower_Picker", 
-        text = "Square Tower", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"] * 3
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.MIDDLE, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ),
-        callback = None
-    )
-    # Square Tower Cost Label
-    square_tower_cost = Box.create_text_box(
-        name = "Square_Tower_Cost", 
-        text = "Cost: 25", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"] * 4
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.END, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"] // 2
-        ), 
-        box_color = (0, 0, 0), 
-        alpha = 128, 
-        text_color = (255, 255, 255), 
-        text_size = 24
-    )
-    # Hexagon Tower Button
-    hexagon_tower_picker = Button.quick_create(
-        name = "Hexagon_Tower_Picker", 
-        text = "Hexagon Tower", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"] * 5
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.MIDDLE, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ),
-        callback = None
-    )
-    # Hexagon Tower Cost Label
-    hexagon_tower_cost = Box.create_text_box(
-        name = "Hexagon_Tower_Cost", 
-        text = "Cost: 25", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"] * 6
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.END, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"] // 2
-        ), 
-        box_color = (0, 0, 0), 
-        alpha = 128, 
-        text_color = (255, 255, 255), 
-        text_size = 24
-    )
-    # Octagon Tower Button
-    octagon_tower_picker = Button.quick_create(
-        name = "Octagon_Tower_Picker", 
-        text = "Octagon Tower", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"] * 7
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.MIDDLE, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ),
-        callback = None
-    )
-    # Octagon Tower Cost Label
-    octagon_tower_cost = Box.create_text_box(
-        name = "Octagon_Tower_Cost", 
-        text = "Cost: 50", 
-        position = (
-            screen_positions["tithe_x"] * 9, 
-            screen_positions["tithe_y"] * 8
-        ), 
-        h_align = Alignment.MIDDLE, 
-        v_align = Alignment.END, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"] // 2
-        ), 
-        box_color = (0, 0, 0), 
-        alpha = 128, 
-        text_color = (255, 255, 255), 
-        text_size = 24
-    )
-    # Add Tower Panel Components
-    tower_panel.add_children([
-        circle_tower_picker,
-        circle_tower_cost,
-        square_tower_picker,
-        square_tower_cost,
-        hexagon_tower_picker,
-        hexagon_tower_cost,
-        octagon_tower_picker,
-        octagon_tower_cost
-    ])
+    #Circle Tower
+    tower_panel.add_children(generate_tower_picker("Circle", 1, 10, None))
+    #Square Tower
+    tower_panel.add_children(generate_tower_picker("Square", 2, 25, None))
+    #Hexagon Tower
+    tower_panel.add_children(generate_tower_picker("Hexagon", 3, 25, None))
+    #Octagon Tower
+    tower_panel.add_children(generate_tower_picker("Octagon", 4, 50, None))
 
     #Information Panel
     information_panel = Box(
