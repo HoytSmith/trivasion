@@ -31,16 +31,20 @@ class GameInterface():
     def is_active(self):
         return self.__active
     
-    #VISIBILITY METHODS:
+    #VISIBILITY METHODS: (ALSO AFFECTS ACTIVITY)
     def hide(self):
         for component in self.__components:
             component.hide()
+            component.deactivate()
         self.__visible = False
+        self.__active = False
     
     def show(self):
         for component in self.__components:
             component.show()
+            component.activate()
         self.__visible = True
+        self.__active = True
     
     def is_visible(self):
         return self.__visible
