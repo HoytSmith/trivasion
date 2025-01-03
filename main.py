@@ -4,6 +4,7 @@ from src.gamesettings import GameSettings
 from src.gamestates import GameState
 from src.gameinterface import GameInterface
 from src.gameinterfacecomponent import GameInterfaceComponent
+from src.gameinterfacemanager import GameInterfaceManager
 from src.alignment import Alignment
 from src.label import Label
 from src.box import Box
@@ -24,6 +25,8 @@ clock = None
 screen_positions = {
     "top" : None,
     "left" : None,
+    "tithe_x" : None,
+    "tithe_y" : None,
     "center_x" : None,
     "center_y" : None,
     "right" : None,
@@ -51,6 +54,15 @@ def init_settings():
         game_settings = GameSettings("settings", "DEFAULT_SETTINGS.json", "GAME_SETTINGS.json", "OPTIONS_SETTINGS.json")
     game_settings.load_selected_options()
 
+#called when settings are changed
+def save_options():
+    global game_settings, current_state
+    changed_flags = game_settings.apply_selection_options()
+    if changed_flags["fullscreen"] or changed_flags["resolution"]:
+        init_display()
+        init_interfaces()
+        change_state(current_state)
+
 #initialize everything related to pygame
 def init_pygame():
     global clock
@@ -76,607 +88,132 @@ def init_display():
         "bottom" : resolution[1],
     }
 
-#(re)set main menu interface
-def init_menu_interface():
-    def generate_options_row(option, row_number):
-        global game_settings
-        row_number += 2
-        capitalized = option.capitalize()
-        row = Box(
-            name = f"Menu_Options_{capitalized}_Row",
-            position = (
-                screen_positions["tithe_x"],
-                screen_positions["tithe_y"] * row_number
-            ),
-            size = (
-                screen_positions["tithe_x"] * 5,
-                screen_positions["tithe_y"]
-            ),
-            color = (255, 0, 0),
-            alpha = 128
-        )
-        title = Box.create_text_box(
-            name = f"Menu_Options_{capitalized}_Title", 
-            priority = 1,
-            text = f"{capitalized}:", 
-            position = (
-                screen_positions["tithe_x"] * 2,
-                screen_positions["tithe_y"] * row_number
-            ), 
-            h_align = Alignment.MIDDLE, 
-            v_align = Alignment.START, 
-            size = (
-                screen_positions["tithe_x"] * 2,
-                screen_positions["tithe_y"]
-            ), 
-            padding = (4, 2), 
-            box_color = (0, 0, 228), 
-            alpha = 128, 
-            text_size = 30
-        )
-        selected = Box.create_text_box(
-            name = f"Menu_Options_{capitalized}_Selected", 
-            priority = 1,
-            text = game_settings.get_selected_option_text(option), 
-            position = (
-                screen_positions["tithe_x"] * 5,
-                screen_positions["tithe_y"] * row_number
-            ), 
-            h_align = Alignment.MIDDLE, 
-            v_align = Alignment.START, 
-            size = (
-                screen_positions["tithe_x"],
-                screen_positions["tithe_y"]
-            ), 
-            padding = (4, 2), 
-            box_color = (0, 0, 228), 
-            alpha = 128, 
-            text_size = 30
-        )
-        selected_label = selected.get_child(f"Menu_Options_{capitalized}_Selected_Label")
-        previous_button = Button.quick_create(
-            name = f"Menu_Options_{capitalized}_Previous_Button", 
-            text = "<", 
-            position = (
-                screen_positions["tithe_x"] * 4,
-                screen_positions["tithe_y"] * row_number
-            ), 
-            h_align = Alignment.START, 
-            v_align = Alignment.START, 
-            size = (
-                screen_positions["tithe_x"]//2, 
-                screen_positions["tithe_y"]
-            ), 
-            padding = (4, 2), 
-            callback = lambda : selected_label.update_content(game_settings.select_previous_option(option))
-        )
-        next_button = Button.quick_create(
-            name = f"Menu_Options_{capitalized}_Next_Button", 
-            text = ">", 
-            position = (
-                screen_positions["tithe_x"] * 6,
-                screen_positions["tithe_y"] * row_number
-            ), 
-            h_align = Alignment.END, 
-            v_align = Alignment.START, 
-            size = (
-                screen_positions["tithe_x"]//2, 
-                screen_positions["tithe_y"]
-            ), 
-            padding = (4, 2), 
-            callback = lambda : selected_label.update_content(game_settings.select_next_option(option))
-        )
-        row.add_children([
-            title,
-            selected,
-            previous_button,
-            next_button
-        ])
-        return row
-    
-    global screen_positions, game_settings
-    menu_interface = GameInterface(priority=0)
-
-    #menu title stuff
-    menu_title_box = Box.create_text_box(
-        name = "Menu_Title_Box", 
-        text = "TriVasion!", 
-        position = (
-            screen_positions["center_x"],
-            screen_positions["tithe_y"]
-        ), 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["right"], 
-            screen_positions["tithe_y"]
-        ), 
-        padding = (10, 5), 
-        box_color = (100, 100, 100), 
-        text_size = 64
-    )
-
-    # menu options panel: 
-    # options_title 
-    menu_options_title = Box.create_text_box(
-        name = "Menu_Options_Title", 
-        text = "Options", 
-        position = (
-            screen_positions["center_x"]//2,
-            screen_positions["tithe_y"]*2
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"]*2,
-            screen_positions["tithe_y"]
-        ), 
-        padding = (4, 2), 
-        box_color = (0, 0, 228), 
-        text_size = 42
-    )
-    # options_panel 
-    menu_options_panel = Box(
-        name = "Menu_Options_Panel",
-        position = (
-            screen_positions["tithe_x"],
-            screen_positions["tithe_y"] * 3
-        ),
-        size = (
-            screen_positions["tithe_x"] * 5,
-            screen_positions["tithe_y"] * 6
-        ),
-        color = (255, 64, 64)
-    )
-    # save options button
-    menu_options_save_button = Button.quick_create(
-        name = "Menu_Options_Save_Button", 
-        text = "Save", 
-        position = (
-            screen_positions["center_x"]//2,
-            screen_positions["tithe_y"] * 9
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"]*2, 
-            screen_positions["tithe_y"]
-        ), 
-        padding = (4, 2), 
-        callback = lambda : game_settings.apply_selection_options()
-    )
-    # options_waves 
-    menu_options_waves_row = generate_options_row("waves", 1)
-    # options_difficulty 
-    menu_options_difficulty_row = generate_options_row("difficulty", 2)
-    # options_volume 
-    menu_options_volume_row = generate_options_row("volume", 3)
-    # options_fullscreen 
-    menu_options_fullscreen_row = generate_options_row("fullscreen", 4)
-    # options_resolution 
-    menu_options_resolution_row = generate_options_row("resolution", 5)
-    # options_fps
-    menu_options_fps_row = generate_options_row("fps", 6)
-    # add components to menu_options_panel
-    menu_options_panel.add_children([
-        menu_options_waves_row,
-        menu_options_difficulty_row,
-        menu_options_volume_row,
-        menu_options_fullscreen_row,
-        menu_options_resolution_row,
-        menu_options_fps_row
-    ])
-
-    #menu buttons
-    menu_start_button = Button.quick_create(
-        name = "Menu_Start_Button", 
-        text = "Start Game", 
-        position = (
-            screen_positions["right"] - (screen_positions["tithe_x"] * 2), 
-            screen_positions["center_y"]
-        ), 
-        v_align = Alignment.END,
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ), 
-        padding = (10, 5), 
-        callback = lambda: queue_state(GameState.PLAY)
-    )
-    menu_quit_button = Button.quick_create(
-        name = "Menu_Quit_Button", 
-        text = "Quit Game", 
-        position = (
-            screen_positions["right"] - (screen_positions["tithe_x"] * 2), 
-            screen_positions["center_y"] + (screen_positions["tithe_y"] * 2)
-        ), 
-        v_align = Alignment.START,
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ), 
-        padding = (10, 5), 
-        callback = lambda: queue_state(GameState.QUIT)
-    )
-
-    #add components to interface
-    menu_interface.add_components([
-        menu_title_box, 
-        menu_options_title, 
-        menu_options_panel, 
-        menu_options_save_button, 
-        menu_start_button, 
-        menu_quit_button
-    ])
-    return menu_interface
-
-#(re)set gameplay interface
-def init_gameplay_interface():
-    def generate_tower_picker(name, pos, cost, callback):
-        global screen_positions
-        
-        #Tower Picker Button
-        picker_button = Button.quick_create(
-            name = f"{name}_Tower_Picker", 
-            text = f"{name} Tower", 
-            position = (
-                screen_positions["tithe_x"] * 9, 
-                screen_positions["tithe_y"] * (2 * pos - 1)
-            ), 
-            h_align = Alignment.MIDDLE, 
-            v_align = Alignment.MIDDLE, 
-            size = (
-                screen_positions["tithe_x"], 
-                screen_positions["tithe_y"]
-            ),
-            callback = callback
-        )
-        #Tower Cost Label
-        cost_label = Box.create_text_box(
-            name = f"{name}_Tower_Cost", 
-            text = f"Cost: {cost}", 
-            position = (
-                screen_positions["tithe_x"] * 9, 
-                screen_positions["tithe_y"] * (2 * pos)
-            ), 
-            h_align = Alignment.MIDDLE, 
-            v_align = Alignment.END, 
-            size = (
-                screen_positions["tithe_x"], 
-                screen_positions["tithe_y"] // 2
-            ), 
-            box_color = (0, 0, 0), 
-            alpha = 128, 
-            text_color = (255, 255, 255), 
-            text_size = 24
-        )
-
-        return [picker_button, cost_label]
-    global screen_positions, game_settings
-    gameplay_interface = GameInterface(priority=0)
-
-    #Tower Panel
-    tower_panel = Box(
-        name="Tower_Panel", 
-        priority=1, 
-        position=(
-            screen_positions["tithe_x"] * 8, 
-            0
-        ),
-        size=(
-            screen_positions["tithe_x"] * 2, 
-            screen_positions["tithe_y"] * 8
-        ),
-        color=(100, 100, 100),
-        alpha=128
-    )
-    #Circle Tower
-    tower_panel.add_children(generate_tower_picker("Circle", 1, 10, None))
-    #Square Tower
-    tower_panel.add_children(generate_tower_picker("Square", 2, 25, None))
-    #Hexagon Tower
-    tower_panel.add_children(generate_tower_picker("Hexagon", 3, 25, None))
-    #Octagon Tower
-    tower_panel.add_children(generate_tower_picker("Octagon", 4, 50, None))
-
-    #Information Panel
-    information_panel = Box(
-        name="Information_Panel", 
-        priority=1, 
-        position=(
-            0, 
-            screen_positions["tithe_y"] * 8
-        ),
-        size=(
-            screen_positions["right"], 
-            screen_positions["tithe_y"] * 2
-        ),
-        color=(100, 100, 100),
-        alpha=128
-    )
-    # Lives Label
-    lives_label = Box.create_text_box(
-        name = "Lives_Label", 
-        text = "Lives: 10", 
-        position = (
-            0, 
-            screen_positions["tithe_y"] * 8
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"] * 3, 
-            screen_positions["tithe_y"]
-        ), 
-        box_color = (0, 0, 0), 
-        alpha = 128, 
-        text_color = (255, 255, 255), 
-        text_size = 30
-    )
-    # Credits Label
-    credits_label = Box.create_text_box(
-        name = "Credits_Label", 
-        text = "Credits: 100", 
-        position = (
-            0, 
-            screen_positions["tithe_y"] * 9
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"] * 3, 
-            screen_positions["tithe_y"]
-        ), 
-        box_color = (0, 0, 0), 
-        alpha = 128, 
-        text_color = (255, 255, 255), 
-        text_size = 30
-    )
-    # Play Pause Button
-    play_pause_button = Button.quick_create(
-        name = "Play_Pause_Button", 
-        text = "||", 
-        position = (
-            screen_positions["tithe_x"] * 4, 
-            screen_positions["tithe_y"] * 8
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ),
-        padding = (4, 2), 
-        callback = lambda: queue_state(GameState.PAUSE)
-    )
-    # Fast Forward Button
-    fast_forward_button = Button.quick_create(
-        name = "Fast_Foward_Button", 
-        text = ">>", 
-        position = (
-            screen_positions["tithe_x"] * 5, 
-            screen_positions["tithe_y"] * 8
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"], 
-            screen_positions["tithe_y"]
-        ),
-        padding = (4, 2), 
-        callback = None
-    )
-    # Waves Label
-    waves_label = Box.create_text_box(
-        name = "Waves_Label", 
-        text = "Wave: 1/10", 
-        position = (
-            screen_positions["tithe_x"] * 4, 
-            screen_positions["tithe_y"] * 9
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"] * 2, 
-            screen_positions["tithe_y"]
-        ), 
-        box_color = (0, 0, 0), 
-        alpha = 128, 
-        text_color = (255, 255, 255), 
-        text_size = 24
-    )
-    # Main Menu Button
-    main_menu_button = Button.quick_create(
-        name = "Main_Menu_Button", 
-        text = "Main Menu", 
-        position = (
-            screen_positions["tithe_x"] * 7, 
-            screen_positions["tithe_y"] * 8
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"] * 3, 
-            screen_positions["tithe_y"]
-        ),
-        padding = (4, 2), 
-        callback = lambda: queue_state(GameState.START)
-    )
-    # Quit Game Button
-    quit_game_button = Button.quick_create(
-        name = "Quit_Game_Button", 
-        text = "Quit Game", 
-        position = (
-            screen_positions["tithe_x"] * 7, 
-            screen_positions["tithe_y"] * 9
-        ), 
-        h_align = Alignment.START, 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["tithe_x"] * 3, 
-            screen_positions["tithe_y"]
-        ),
-        padding = (4, 2), 
-        callback = lambda: queue_state(GameState.QUIT)
-    )
-    # Add Information Panel Components
-    information_panel.add_children([
-        lives_label,
-        credits_label,
-        play_pause_button,
-        fast_forward_button,
-        waves_label,
-        main_menu_button,
-        quit_game_button
-    ])
-
-    #add components to interface
-    gameplay_interface.add_components([
-        tower_panel,
-        information_panel
-    ])
-
-    return gameplay_interface
-
-#(re)set paused game interface overlay
-def init_gamepause_interface():
-    global screen_positions
-    gamepause_interface = GameInterface(priority=10)
-
-    #gamepause screen overlay
-    gamepause_background_box = Box(
-        name = "Gamepause_Background", 
-        priority = 0, 
-        position = (
-            screen_positions["left"], 
-            screen_positions["top"]
-        ), 
-        size = (
-            screen_positions["right"], 
-            screen_positions["bottom"]
-        ), 
-        color = (0, 0, 0),
-        alpha = 128
-    )
-
-    #gamepause title stuff
-    gamepause_title_box = Box.create_text_box(
-        name = "Gamepause_Title_Box", 
-        priority = 1, 
-        text = "Game Paused", 
-        position = (
-            screen_positions["center_x"], 
-            50
-        ), 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["right"], 
-            50
-        ), 
-        padding = (10, 5), 
-        box_color = (64, 64, 64), 
-        text_color = (200, 200, 200),
-        text_size = 50
-    )
-
-    #gameplay button stuff
-    gamepause_resume_button = Button.quick_create(
-        name = "Gamepause_Resume_Button", 
-        priority = 1, 
-        text = "Resume Game", 
-        position = (
-            screen_positions["center_x"], 
-            screen_positions["center_y"] 
-        ), 
-        padding = (10, 5), 
-        button_color = (0, 1, 0), 
-        callback = lambda: queue_state(GameState.PLAY)
-    )
-    
-    #add components to interface
-    gamepause_interface.add_components([
-        gamepause_background_box,
-        gamepause_title_box,
-        gamepause_resume_button
-    ])
-    return gamepause_interface
-
-#(re)set game-over interface overlay
-def init_gameover_interface():
-    global screen_positions
-    gameover_interface = GameInterface(priority=10)
-
-    #gamepause screen overlay
-    gameover_background_box = Box(
-        name = "Gameover_Background", 
-        priority = 0, 
-        position = (
-            screen_positions["left"], 
-            screen_positions["top"]
-        ), 
-        size = (
-            screen_positions["right"], 
-            screen_positions["bottom"]
-        ), 
-        color = (0, 0, 0),
-        alpha = 128
-    )
-
-    #gamepause title stuff
-    gameover_title_box = Box.create_text_box(
-        name = "Gameover_Title_Box", 
-        priority = 1, 
-        text = "Game Over", 
-        position = (
-            screen_positions["center_x"], 
-            50
-        ), 
-        v_align = Alignment.START, 
-        size = (
-            screen_positions["right"], 
-            50
-        ), 
-        padding = (10, 5), 
-        box_color = (64, 64, 64), 
-        text_color = (200, 200, 200),
-        text_size = 50
-    )
-
-    #gameplay button stuff
-    gameover_retry_button = Button.quick_create(
-        name = "Gameover_Retry_Button", 
-        priority = 1, 
-        text = "Try Again", 
-        position = (
-            screen_positions["center_x"], 
-            screen_positions["center_y"] 
-        ), 
-        padding = (10, 5), 
-        button_color = (0, 1, 0), 
-        callback = lambda: queue_state(GameState.START)
-    )
-
-    #add components to interface
-    gameover_interface.add_components([
-        gameover_background_box,
-        gameover_title_box,
-        gameover_retry_button
-    ])
-    return gameover_interface
-
 #(re)set all interfaces
 def init_interfaces():
-    global interfaces
-    interfaces = {
-        GameState.MENU : init_menu_interface(),
-        GameState.PLAY : init_gameplay_interface(),
-        GameState.PAUSE : init_gamepause_interface(),
-        GameState.END : init_gameover_interface()
-    }
+    def implement_options_functionality(options_panel, option):
+        def update_options_label(label, selected, new_content):
+            label.update_content(new_content)
+            selected.position_component_relative(
+                component=label, 
+                position=(50,50), 
+                percent_flag=True, 
+                h_align=Alignment.MIDDLE, 
+                v_align=Alignment.MIDDLE
+            )
+            #End of this function
+        global game_settings
+        #prepare
+        prefix = f"Menu_Options_{option.capitalize()}"
+        option_row = options_panel.get_child(f"{prefix}_Row")
+        option_selected = option_row.get_child(f"{prefix}_Selected")
+        #setup label
+        option_label = option_selected.get_child(f"{prefix}_Selected_Label")
+        update_options_label(option_label, option_selected, game_settings.get_selected_option_text(option))
+        #previous button
+        option_previous = option_row.get_child(f"{prefix}_Previous_Button")
+        option_previous.set_callback(
+            lambda: update_options_label(option_label, option_selected, game_settings.select_previous_option(option))
+        )
+        #next button
+        option_next = option_row.get_child(f"{prefix}_Next_Button")
+        option_next.set_callback(
+            lambda: update_options_label(option_label, option_selected, game_settings.select_next_option(option))
+        )
+        #End of this function
+    global interfaces, game_settings
+    interfaces = GameInterfaceManager(game_settings.get_setting("resolution"))
+    
+    # IMPLEMENT FUNCTIONALITY:
+    # MAIN MENU INTERFACE:
+    menu_interface = interfaces.get_interface(GameState.MENU)
+    # Menu Options Panel                    ("Menu_Options_Panel")
+    menu_options_panel = menu_interface.get_component("Menu_Options_Panel")
+    
+    # WAVES OPTION FUNCTIONALITY:
+    implement_options_functionality(menu_options_panel, "waves")
+    # DIFFICULTY OPTION FUNCTIONALITY:
+    implement_options_functionality(menu_options_panel, "difficulty")
+    # VOLUME OPTION FUNCTIONALITY:
+    implement_options_functionality(menu_options_panel, "volume")
+    # FULLSCREEN OPTION FUNCTIONALITY:
+    implement_options_functionality(menu_options_panel, "fullscreen")
+    # RESOLUTION OPTION FUNCTIONALITY:
+    implement_options_functionality(menu_options_panel, "resolution")
+    # FPS OPTION FUNCTIONALITY:
+    implement_options_functionality(menu_options_panel, "fps")
+
+    # Options Panel Save Button             ("Menu_Options_Panel_Save")
+    options_panel_save = menu_options_panel.get_child("Menu_Options_Panel_Save")
+    options_panel_save.set_callback(
+        lambda : save_options()
+    )
+    # Start Game Button                     ("Menu_Start_Button")
+    menu_start_game = menu_interface.get_component("Menu_Start_Button")
+    menu_start_game.set_callback(
+        lambda: queue_state(GameState.PLAY)
+    )
+    # Quit Game Button                      ("Menu_Quit_Button")
+    menu_quit_game = menu_interface.get_component("Menu_Quit_Button")
+    menu_quit_game.set_callback(
+        lambda: queue_state(GameState.QUIT)
+    )
+
+    # GAME PLAY INTERFACE:
+    gameplay_interface = interfaces.get_interface(GameState.PLAY)
+
+    # TOWERS PANEL FUNCTIONALITY:
+    # Tower Picker Panel                    ("Tower_Panel")
+    tower_panel = gameplay_interface.get_component("Tower_Panel")
+    # Circle Tower Picker Button            ("Circle_Tower_Picker")     (NOT YET IMPLEMENTED)
+    circle_tower_picker = tower_panel.get_child("Circle_Tower_Picker")
+    # Square Tower Picker Button            ("Square_Tower_Picker")     (NOT YET IMPLEMENTED)
+    square_tower_picker = tower_panel.get_child("Square_Tower_Picker")
+    # Hexagon Tower Picker Button           ("Hexagon_Tower_Picker")    (NOT YET IMPLEMENTED)
+    hexagon_tower_picker = tower_panel.get_child("Hexagon_Tower_Picker")
+    # Octagon Tower Picker Button           ("Octagon_Tower_Picker")    (NOT YET IMPLEMENTED)
+    octagon_tower_picker = tower_panel.get_child("Octagon_Tower_Picker")
+
+    # INFORMATION PANEL FUNCTIONALITY:
+    # Information Panel                     ("Information_Panel")
+    information_panel = gameplay_interface.get_component("Information_Panel")
+    # Playpause Button                      ("Playpause_Button")    (TO BE CHANGED?)
+    gameplay_pause_button = information_panel.get_child("Playpause_Button")
+    gameplay_pause_button.set_callback(
+        lambda: queue_state(GameState.PAUSE)
+    )
+    # Fast Forward Button                   ("Fastforward_Button")    (NOT YET IMPLEMENTED)
+    gameplay_fast_forward_button = information_panel.get_child("Fastforward_Button")
+    # Main Menu Button                      ("Main_Menu_Button")
+    gameplay_main_menu_button = information_panel.get_child("Main_Menu_Button")
+    gameplay_main_menu_button.set_callback(
+        lambda: queue_state(GameState.START)
+    )
+    # Quit Game Button                      ("Quit_Game_Button")
+    gameplay_quit_game_button = information_panel.get_child("Quit_Game_Button")
+    gameplay_quit_game_button.set_callback(
+        lambda: queue_state(GameState.QUIT)
+    )
+
+    # GAMEPAUSE INTERFACE:
+    gamepause_interface = interfaces.get_interface(GameState.PAUSE)
+    # Resume Game Button
+    gamepause_resume_button = gamepause_interface.get_component("Gamepause_Resume_Button")
+    gamepause_resume_button.set_callback(
+        lambda: queue_state(GameState.PLAY)
+    )
+
+    # GAME OVER INTERFACE:
+    gameover_interface = interfaces.get_interface(GameState.END)
+    # Retry Game Button
+    gameover_retry_button = gameover_interface.get_component("Gameover_Retry_Button")
+    gameover_retry_button.set_callback(
+        lambda: queue_state(GameState.START)
+    )
 
 #helper function to access specific interface
 def get_interface(state):
     global interfaces
-    return interfaces.get(state, None)
+    return interfaces.get_interface(state)
 
 def queue_state(new_state):
     global pending_state
@@ -685,10 +222,6 @@ def queue_state(new_state):
 #direct gameflow
 def change_state(new_state):
     global game_is_running, current_state
-
-    #quick check to see if this is even necessary
-    if current_state == new_state:
-        return
     
     #various game screens
     menu = get_interface(GameState.MENU)
@@ -705,25 +238,19 @@ def change_state(new_state):
         init_game()
     elif current_state == GameState.MENU:
         menu.show()
-        menu.activate()
     elif current_state == GameState.PLAY:
         if previous_state == GameState.MENU:
             menu.hide()
-            menu.deactivate()
             init_level()
         elif previous_state == GameState.PAUSE:
-            gamepause.deactivate()
             gamepause.hide()
         gameplay.show()
-        gameplay.activate()
     elif current_state == GameState.PAUSE:
         gameplay.deactivate()
         gamepause.show()
-        gamepause.activate()
     elif current_state == GameState.END:
         gameplay.deactivate()
         gameover.show()
-        gameover.activate()
 
 #called during gameloop to handle events
 def handle_events():
@@ -746,9 +273,11 @@ def handle_events():
         if level and not event_consumed:
             event_consumed = level.handle_event(event, mouse_button_held)
         
-        for interface in interfaces.values():
-            if interface.is_active() and not event_consumed:
-                event_consumed = interface.handle_event(event, mouse_button_held)
+        if not event_consumed:
+            event_consumed = interfaces.handle_event(event, mouse_button_held)
+        #for interface in interfaces.values():
+        #    if interface.is_active() and not event_consumed:
+        #        event_consumed = interface.handle_event(event, mouse_button_held)
         
         #Mouse state is toggled after event is consumed
         if toggle_mouse_state:
@@ -771,9 +300,10 @@ def render_game():
         level.render(screen)
     
     #render interfaces on top
-    for i in interfaces:
-        if interfaces[i].is_visible():
-            interfaces[i].render(screen)
+    interfaces.render(screen)
+    #for i in interfaces:
+    #    if interfaces[i].is_visible():
+    #       interfaces[i].render(screen)
     
     #finish rendering
     pygame.display.flip()
