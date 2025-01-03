@@ -97,9 +97,13 @@ class GameSettings():
         return all_indices
 
     def apply_selection_options(self):
+        changed_flags = {}
         if len(self.selected_options) > 0:
+            for option in self.selected_options:
+                changed_flags[option] = (self.game_settings[option] != self.selected_options[option])
             self.game_settings = self.selected_options.copy()
         self.save_settings()
+        return changed_flags
     
     def select_next_option(self, key):
         current_index = self.get_selected_option_index(key)
