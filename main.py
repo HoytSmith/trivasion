@@ -275,9 +275,6 @@ def handle_events():
         
         if not event_consumed:
             event_consumed = interfaces.handle_event(event, mouse_button_held)
-        #for interface in interfaces.values():
-        #    if interface.is_active() and not event_consumed:
-        #        event_consumed = interface.handle_event(event, mouse_button_held)
         
         #Mouse state is toggled after event is consumed
         if toggle_mouse_state:
@@ -301,9 +298,6 @@ def render_game():
     
     #render interfaces on top
     interfaces.render(screen)
-    #for i in interfaces:
-    #    if interfaces[i].is_visible():
-    #       interfaces[i].render(screen)
     
     #finish rendering
     pygame.display.flip()
