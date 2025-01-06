@@ -93,16 +93,15 @@ class GridCell(GameInterfaceComponent):
         return False
     
     def on_click(self):
-        if not self.is_tile_state(TileState.ACTIVE):
-            self.set_tile_state(TileState.ACTIVE)
-            self.update_color(TileState.ACTIVE.value)
+        self.update_tile_state(TileState.ACTIVE)
 
     def on_hover(self):
-        if not self.is_tile_state(TileState.HOVER):
-            self.set_tile_state(TileState.HOVER)
-            self.update_color(TileState.HOVER.value)
+        self.update_tile_state(TileState.HOVER)
 
     def on_idle(self):
-        if not self.is_tile_state(TileState.IDLE):
-            self.set_tile_state(TileState.IDLE)
-            self.update_color(TileState.IDLE.value)
+        self.update_tile_state(TileState.IDLE)
+    
+    def update_tile_state(self, state):
+        if not self.is_tile_state(state):
+            self.set_tile_state(state)
+            self.update_color(state.value)
