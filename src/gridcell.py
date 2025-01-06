@@ -2,9 +2,11 @@
 import pygame
 from src.validate import Validate
 from src.gameinterfacecomponent import GameInterfaceComponent
+from src.tilestate import TileState
 
 class GridCell(GameInterfaceComponent):
     def __init__(self, name="GridCell", position=(0,0), coords=(0,0), size=(8,8), border_thickness=1, border_color=(255, 255, 255)):
+        self.set_tile_state(TileState.IDLE)
         self.set_coords(coords)
         self.set_border_thickness(border_thickness)
         self.set_border_color(border_color)
@@ -12,6 +14,16 @@ class GridCell(GameInterfaceComponent):
         super().__init__(name=name, position=position, size=size, color=(0,0,0))
 
     #SETTERS, GETTERS AND OTHER CLASS METHODS:
+    #TILE STATE METHODS:
+    def set_tile_state(self, state):
+        self.__tile_state = state
+
+    def get_tile_state(self):
+        return self.__tile_state
+
+    def is_tile_state(self, state):
+        return self.__tile_state == state
+
     #COORDINATE METHODS:
     def set_coords(self, coords):
         Validate.grid_coords(coords)
@@ -62,9 +74,35 @@ class GridCell(GameInterfaceComponent):
         return self.__surface
     
     #GAMELOOP METHODS:
-    #def render(self, screen):
-    #    pass
+    def render(self, screen):
+        super().render(screen)
 
     def handle_event(self, event, input):
+        if event.type == pygame.MOUSEBUTTONDOWN and input.left_mouse_click():
+            if self.mouse_over(event.pos):
+                #CLICK
+                self.on_click()
+                return True
+        if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONUP:
+            if self.mouse_over(event.pos):
+                #HOVER
+                self.on_hover()
+            else:
+                #IDLE
+                self.on_idle()
         return False
     
+    def on_click(self):
+        if not self.is_tile_state(TileState.ACTIVE):
+            self.set_tile_state(TileState.ACTIVE)
+            self.update_color(TileState.ACTIVE.value)
+
+    def on_hover(self):
+        if not self.is_tile_state(TileState.HOVER):
+            self.set_tile_state(TileState.HOVER)
+            self.update_color(TileState.HOVER.value)
+
+    def on_idle(self):
+        if not self.is_tile_state(TileState.IDLE):
+            self.set_tile_state(TileState.IDLE)
+            self.update_color(TileState.IDLE.value)
