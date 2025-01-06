@@ -140,10 +140,11 @@ class Button(GameInterfaceComponent):
             label.render(screen)
 
     def handle_event(self, event, input):
-        if input.left_mouse_click() and self.mouse_over(event.pos):
-            self.on_click()
-            return True
-        elif event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONUP:
+        if event.type == pygame.MOUSEBUTTONDOWN and input.left_mouse_click():
+            if self.mouse_over(event.pos):
+                self.on_click()
+                return True
+        if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONUP:
             if self.mouse_over(event.pos):
                 self.change_state(ButtonState.HOVER)
             else:

@@ -23,18 +23,6 @@ pending_state = None
 interfaces = {}
 screen = None
 clock = None
-screen_positions = {
-    "top" : None,
-    "left" : None,
-    "tithe_x" : None,
-    "tithe_y" : None,
-    "center_x" : None,
-    "center_y" : None,
-    "right" : None,
-    "bottom" : None,
-}
-mouse_button_held = False
-pause_keys = [pygame.K_p, pygame.K_ESCAPE]
 level = None
 input = None
 
@@ -80,21 +68,11 @@ def init_pygame():
 
 #(re)initialize the display and related variables
 def init_display():
-    global game_settings, screen, screen_positions
+    global game_settings, screen
     fullscreen = game_settings.get_setting("fullscreen")
     resolution = game_settings.get_setting("resolution")
     flags = pygame.FULLSCREEN if fullscreen else 0
     screen = pygame.display.set_mode(resolution, flags)
-    screen_positions = {
-        "top" : 0,
-        "left" : 0,
-        "tithe_x" : resolution[0]//10,
-        "tithe_y" : resolution[1]//10,
-        "center_x" : resolution[0]//2,
-        "center_y" : resolution[1]//2,
-        "right" : resolution[0],
-        "bottom" : resolution[1],
-    }
 
 #(re)set all interfaces
 def init_interfaces():
