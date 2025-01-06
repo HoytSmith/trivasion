@@ -59,7 +59,7 @@ class Label(GameInterfaceComponent):
     def render(self, screen):
         screen.blit(self.get_label_surface(), self.get_position())
     
-    def handle_event(self, event, mouse_button_held):
+    def handle_event(self, event, input):
         # Labels are always non-interactive
         return False
     

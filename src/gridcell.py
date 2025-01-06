@@ -65,6 +65,6 @@ class GridCell(GameInterfaceComponent):
     #def render(self, screen):
     #    pass
 
-    def handle_event(self, event, mouse_button_held):
+    def handle_event(self, event, input):
         return False
     

@@ -210,7 +210,7 @@ class GameInterfaceComponent():
     def render(self, screen):
         screen.blit(self.get_surface(), self.get_position())
     
-    def handle_event(self, event, mouse_button_held):
+    def handle_event(self, event, input):
         # Default Component doesn't handle events
         return False
     

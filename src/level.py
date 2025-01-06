@@ -67,8 +67,8 @@ class Level():
     def render(self, screen):
         self.__grid.render(screen)
 
-    def handle_event(self, event, mouse_button_held):
-        return self.__grid.handle_event(event, mouse_button_held)
-    
+    def handle_event(self, event, input):
+        return self.__grid.handle_event(event, input)
+
     def update(self, delta_time):
         pass

@@ -71,10 +71,10 @@ class Grid(GameInterfaceComponent):
             for y in range(height):
                 self.__cells[y][x].render(screen)
 
-    def handle_event(self, event, mouse_button_held):
+    def handle_event(self, event, input):
         width, height = self.get_grid_size()
         for x in range(width):
             for y in range(height):
-                if self.__cells[y][x].handle_event(event, mouse_button_held):
+                if self.__cells[y][x].handle_event(event, input):
                     return True
         return False

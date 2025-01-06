@@ -156,10 +156,10 @@ class GameInterfaceManager():
             if interface.is_visible():
                 interface.render(screen)
 
-    def handle_event(self, event, mouse_button_held):
+    def handle_event(self, event, input):
         for interface in self.__interfaces.values():
             if interface.is_active():
-                if interface.handle_event(event, mouse_button_held):
+                if interface.handle_event(event, input):
                     return True
         return False
 

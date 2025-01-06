@@ -13,6 +13,7 @@ from src.button import Button
 from src.level import Level
 from src.grid import Grid
 from src.gridcell import GridCell
+from src.input import Input
 
 #globals
 game_is_running = True
@@ -35,12 +36,19 @@ screen_positions = {
 mouse_button_held = False
 pause_keys = [pygame.K_p, pygame.K_ESCAPE]
 level = None
+input = None
 
 #initializes the game. resets everything when called again later
 def init_game():
     init_settings()
     init_interfaces()
+    init_input()
     change_state(GameState.MENU)
+
+#initializes input tracker
+def init_input():
+    global input
+    input = Input()
 
 #initializes the game's level
 def init_level():
@@ -254,31 +262,31 @@ def change_state(new_state):
 
 #called during gameloop to handle events
 def handle_events():
-    global game_is_running, pending_state, interfaces, mouse_button_held, pause_keys, current_state
+    global game_is_running, pending_state, input, level, interfaces, mouse_button_held, pause_keys, current_state
     for event in pygame.event.get():
-        event_consumed = False
+        #check for game end first
         if event.type == pygame.QUIT:
             game_is_running = False
             return
-        if event.type == pygame.KEYDOWN:
-            if event.key in pause_keys and current_state == GameState.PLAY:
-                queue_state(GameState.PAUSE)
-                event_consumed = True
-        #Ensure only first frame of MOUSEBUTTONDOWN is processed
-        toggle_mouse_state = (
-            (event.type == pygame.MOUSEBUTTONDOWN and not mouse_button_held) or 
-            (event.type == pygame.MOUSEBUTTONUP and mouse_button_held)
-        )
+        
+        #update our input tracker
+        input.handle_event(event)
 
+        #setup event handling variables
+        event_consumed = False
+
+        #global event first
+        if current_state == GameState.PLAY and input.pause_pressed():
+            queue_state(GameState.PAUSE)
+            event_consumed = True
+        
+        #level events
         if level and not event_consumed:
-            event_consumed = level.handle_event(event, mouse_button_held)
+            event_consumed = level.handle_event(event, input)
         
+        #interface events
         if not event_consumed:
-            event_consumed = interfaces.handle_event(event, mouse_button_held)
-        
-        #Mouse state is toggled after event is consumed
-        if toggle_mouse_state:
-            mouse_button_held = not mouse_button_held
+            event_consumed = interfaces.handle_event(event, input)
         
         #resolve state changes after events are handled
         if pending_state:
@@ -287,7 +295,7 @@ def handle_events():
 
 #called during gameloop to render the game
 def render_game():
-    global screen, interfaces, current_state
+    global screen, level, interfaces, current_state
 
     #reset screen
     screen.fill("black")
@@ -310,7 +318,7 @@ def update_game(delta_time):
 
 #main program, contains the gameloop
 def main():
-    global game_is_running, game_settings, clock, pending_state
+    global game_is_running, game_settings, clock
     init_pygame()
     init_game()
 
